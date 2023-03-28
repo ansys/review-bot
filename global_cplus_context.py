@@ -24,35 +24,27 @@ token = os.environ.get('TOKEN')
 openai.api_key = token 
 
 sample_code = """
-    class A_MyCode_Sample
+   int functionA() 
     {
-        A_MyCode_Sample();
-        
-        protected:
-        
-            void setValue ( int val ) { m_MyVar = val; }
-            
-        private:
-        
-            int m_MyVar = 2;    
-    };
+        int num = 5;
+        while (num < 10) {
+            std::cout << num << std::endl;
+            num--; 
+        }
+        return 0;
+    }
+"""
+
+prompt_query1 = """"
+    Please review the sample_code for logical mistakes and don't add comments on the context_code
+    """
+
+prompt_query2 = """"
+    Please review the sample_code for readability and logical mistakes based on the context_code provided and don't write the context_code
+    and give suggestions for the sample_code only
+    """
     
-    class Special: A_MyCode_Sample
-    {
-       public:
-          Special()
-          : A_MyCode_Sample()
-          {};
-        
-    };
-"""
-
-prompt = """
-
-Please review the sample_code for readability based on the context_code provided and don't write the context_code
-and give suggestions for the sample_code only
-
-"""
+prompt = prompt_query1
 
 prompt += "context_code:"
 file_list = ['ParentClass.h','ParentClass.cpp','ChildClass.h','ChildClass.cpp']
@@ -69,7 +61,7 @@ prompt += "public in front of constructor"
 response = openai.ChatCompletion.create(
   model="gpt-4",
   messages=[
-        {"role": "system", "content": "You are a very kind programmer."},
+        {"role": "system", "content": "You are a very kind reviewer."},
         {"role": "user", "content": prompt + sample_code},
         # {"role": "assistant", "content": init_response},
         # {"role": "user", "content": elab}

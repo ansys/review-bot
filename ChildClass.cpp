@@ -1,6 +1,6 @@
 #include "ChildClass.h"
 
-using namespace GlobalContextNameSpace;
+using namespace GlobalContextClassNameSpace;
 
 ChildClass::ChildClass()
 : ParentClass()

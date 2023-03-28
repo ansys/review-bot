@@ -1,7 +1,7 @@
 #ifndef CHILD_CLASS_CONTEXT_MODEL_H
 #define CHILD_CLASS_CONTEXT_MODEL_H
 
-#include <ParentClass.h>
+#include "ParentClass.h"
 
 namespace GlobalContextClassNameSpace
 {
