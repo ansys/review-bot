@@ -1,10 +1,24 @@
 import logging
 import os
+import threading
 
 import requests
 
 LOG = logging.getLogger(__name__)
 LOG.setLevel("DEBUG")
+
+
+def _fetch_file_content(file_data, headers):
+    """Fetch the content of a single file."""
+    content_response = requests.get(
+        file_data["contents_url"], headers=headers, timeout=10
+    )
+
+    if content_response.status_code == 200:
+        content = content_response.json()
+        file_data["file_text"] = requests.get(content["download_url"], timeout=10).text
+    else:
+        raise RuntimeError("Error fetching file content")
 
 
 def _get_token():
@@ -71,21 +85,29 @@ def get_changed_files_and_contents(owner, repo, pull_number):
 
     files = response.json()
 
+    access_token = _get_token()
+    url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pull_number}/files"
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    response = requests.get(url, headers=headers, timeout=10)
+
+    if response.status_code != 200:
+        print(f"Error fetching pull request files: {response.status_code}")
+        return
+
+    files = response.json()
+    threads = []
+
     for file_data in files:
         LOG.info("Filename: %s", file_data["filename"])
         LOG.info("Status: %s", file_data["status"])
         LOG.info("Content:")
 
-        content_response = requests.get(
-            file_data["contents_url"], headers=headers, timeout=10
-        )
+        t = threading.Thread(target=_fetch_file_content, args=(file_data, headers))
+        threads.append(t)
+        t.start()
 
-        if content_response.status_code == 200:
-            content = content_response.json()
-            file_data["file_text"] = requests.get(
-                content["download_url"], timeout=10
-            ).text
-        else:
-            raise RuntimeError("Error fetching file content")
+    for t in threads:
+        t.join()
 
     return files
