@@ -34,11 +34,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  smoke-tests:
-    name: "Build and Smoke tests"
-    runs-on: ${{ matrix.os }}
-
-
   tests:
     name: "Tests"
     runs-on: ${{ matrix.os }}
