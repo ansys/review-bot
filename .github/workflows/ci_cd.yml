@@ -45,7 +45,7 @@ jobs:
     steps:
       - uses: pyansys/actions/tests-pytest@v4
         with:
-          pytest-extra-args: "--cov=review-bot --cov-report=term --cov-report=html:.cov/html"
+          pytest-extra-args: "--cov=review_bot --cov-report=term --cov-report=html:.cov/html"
 
   # doc-build:
   #   name: "Build documentation"
