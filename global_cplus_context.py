@@ -9,9 +9,13 @@ https://platform.openai.com/docs/guides/chat
 
 """
 import openai
+import secrets
+import os
 
 # CSEBU token
-openai.api_key = "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"
+token = os.environ.get('TOKEN')
+
+openai.api_key = token 
 
 
 prompt = """
