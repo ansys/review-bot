@@ -26,18 +26,17 @@ jobs:
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
 
-  doc-style:
-    name: "Documentation style"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: pyansys/actions/doc-style@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+  # doc-style:
+  #   name: "Documentation style"
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: pyansys/actions/doc-style@v4
+  #       with:
+  #         token: ${{ secrets.GITHUB_TOKEN }}
 
   tests:
     name: "Tests"
     runs-on: ${{ matrix.os }}
-    needs: [code-style]
     strategy:
       matrix:
        os: [ubuntu-latest, windows-latest]
@@ -46,7 +45,7 @@ jobs:
     steps:
       - uses: pyansys/actions/tests-pytest@v4
         with:
-          pytest-extra-args: "--cov=ansys --cov-report=term --cov-report=html:.cov/html"
+          pytest-extra-args: "--cov=review-bot --cov-report=term --cov-report=html:.cov/html"
 
   # doc-build:
   #   name: "Build documentation"
