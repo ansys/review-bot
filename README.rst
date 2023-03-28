@@ -7,12 +7,12 @@ hackathon-review-bot
    :target: https://docs.pyansys.com/
    :alt: PyAnsys
 
-.. |codecov| image:: https://codecov.io/gh/pyansys/pyproduct-library/branch/main/graph/badge.svg
-   :target: https://codecov.io/gh/pyansys/pyproduct-library
+.. |codecov| image:: https://codecov.io/gh/ansys/hackathon-review-bot/branch/main/graph/badge.svg
+   :target: https://codecov.io/gh/ansys/hackathon-review-bot
    :alt: Codecov
 
-.. |GH-CI| image:: https://github.com/pyansys/pyproduct-library/actions/workflows/ci_cd.yml/badge.svg
-   :target: https://github.com/pyansys/pyproduct-library/actions/workflows/ci_cd.yml
+.. |GH-CI| image:: https://github.com/ansys/hackathon-review-bot/actions/workflows/ci_cd.yml/badge.svg
+   :target: https://github.com/ansys/hackathon-review-bot/actions/workflows/ci_cd.yml
    :alt: GH-CI
 
 .. |MIT| image:: https://img.shields.io/badge/License-MIT-yellow.svg
