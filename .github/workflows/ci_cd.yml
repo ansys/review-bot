@@ -46,6 +46,8 @@ jobs:
       - uses: pyansys/actions/tests-pytest@v4
         with:
           pytest-extra-args: "--cov=review_bot --cov-report=term --cov-report=html:.cov/html"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # doc-build:
   #   name: "Build documentation"

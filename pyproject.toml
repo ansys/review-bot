@@ -25,6 +25,7 @@ classifiers = [
 ]
 dependencies = [
     "importlib-metadata >=4.0",
+    "requests",
 ]
 
 [project.optional-dependencies]
