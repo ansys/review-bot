@@ -16,7 +16,7 @@ import openai
 
 if not os.environ.get('TOKEN'):
     print('TOKEN environment variable is not defined.')
-    sys.exit(1)
+    sys.exit(0)
     
 # CSEBU token
 token = os.environ.get('TOKEN')
