@@ -62,9 +62,9 @@ def generate_prompt(prompt_query: str, file_list: list) -> str:
 
 def call_openai(prompt: str, sample_code: str):
     response = openai.ChatCompletion.create(
-        model="gpt-4",
+        model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "You are a very kind reviewer."},
+            {"role": "system", "content": "You are a kind reviewer."},
             {"role": "user", "content": prompt + sample_code},
             # {"role": "assistant", "content": init_response},
             # {"role": "user", "content": elab}
