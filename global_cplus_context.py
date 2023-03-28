@@ -30,6 +30,15 @@ sample_code = """
         
             int m_MyVar = 2;    
     };
+    
+    class Special: A_MyCode_Sample
+    {
+       public:
+          Special()
+          : A_MyCode_Sample()
+          {};
+        
+    };
 """
 
 prompt = """
@@ -47,6 +56,9 @@ for file in file_list:
         data = file.read().replace('\n', '')
     prompt += data
 
+prompt += "some basic rules to check:"
+prompt += "comments"
+prompt += "public in front of constructor"
 
 response = openai.ChatCompletion.create(
   model="gpt-4",
