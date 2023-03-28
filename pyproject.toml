@@ -48,7 +48,6 @@ Source = "https://github.com/ansys/hackathon-review-bot"
 Tracker = "https://github.com/ansys/hackathon-review-bot/issues"
 Homepage = "https://github.com/ansys/hackathon-review-bot"
 
-
 [tool.black]
 line-length = 100
 
