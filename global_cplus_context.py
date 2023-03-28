@@ -13,40 +13,20 @@ import openai
 # CSEBU token
 openai.api_key = "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"
 
+
 prompt = """
 
 Create a c++ class using this democode
 
-#ifndef BASE_CLASS_MODEL_H
-#define BASE_CLASS_MODEL_H
-
-namespace BaseClassNameSpace
-{
-  class BaseClass
-  {
-    public:
-      BaseClass(){};
-      ~BaseClass(){};
-      
-      int getValue();
-      
-    protected:
-        int m_A    = 0;
-        double m_B = 0.0;
-    
-    private:
-        std::string name = "";
-    };
-} 
-
-inline int BaseClass::getValue()
-{
-  return m_A;
-}
-
-#endif
-
 """
+
+with open('GlobalContextClass.h', 'r') as file:
+    data = file.read().replace('\n', '')
+prompt += data
+
+with open('GlobalContextClass.cpp', 'r') as file:
+    data = file.read().replace('\n', '')
+prompt += data
 
 response = openai.ChatCompletion.create(
   model="gpt-4",
