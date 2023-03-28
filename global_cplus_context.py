@@ -8,10 +8,16 @@ Chat completion API:
 https://platform.openai.com/docs/guides/chat
 
 """
-import openai
+
 import secrets
 import os
+import sys
+import openai
 
+if not os.environ.get('TOKEN'):
+    print('TOKEN environment variable is not defined.')
+    sys.exit(1)
+    
 # CSEBU token
 token = os.environ.get('TOKEN')
 
