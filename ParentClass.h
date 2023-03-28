@@ -1,9 +1,9 @@
-#ifndef GLOBAL_CONTEXT_CLASS_MODEL_H
-#define GLOBAL_CONTEXT_CLASS_MODEL_H
+#ifndef PARENT_CLASS_CONTEXT_MODEL_H
+#define PARENT_CLASS_CONTEXT_MODEL_H
 
 #include <string>
 
-namespace GlobalContextNameSpace
+namespace GlobalContextClassNameSpace
 {
   class ParentClass
   {
@@ -11,7 +11,7 @@ namespace GlobalContextNameSpace
       ParentClass();
       ~ParentClass();
       
-      virtual int getValue();
+      virtual int getValue() const = 0;
       
     protected:
         int m_A    = 0;
@@ -20,14 +20,7 @@ namespace GlobalContextNameSpace
     private:
         std::string name = "";
     };
-
-   class  
-} // GlobalContextNameSpace
-
-inline int ParentClass::getValue()
-{
-  return m_A;
-}
+} // GlobalContextClassNameSpace
 
 
 

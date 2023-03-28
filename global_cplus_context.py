@@ -20,13 +20,13 @@ Create a c++ class using this democode
 
 """
 
-with open('GlobalContextClass.h', 'r') as file:
-    data = file.read().replace('\n', '')
-prompt += data
+file_list = ['ParentClass.h','ParentClass.cpp','ChildClass.h','ChildClass.cpp']
 
-with open('GlobalContextClass.cpp', 'r') as file:
-    data = file.read().replace('\n', '')
-prompt += data
+for file in file_list:
+    with open(file, 'r') as file:
+        data = file.read().replace('\n', '')
+    prompt += data
+
 
 response = openai.ChatCompletion.create(
   model="gpt-4",
