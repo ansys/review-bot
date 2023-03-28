@@ -1,5 +1,7 @@
 import re
 
+# pragma: no cover
+
 
 def filter_log(log: str, exclude_patterns: []) -> str:
     r"""Remove patterns from a log file
