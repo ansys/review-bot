@@ -17,13 +17,29 @@ token = os.environ.get('TOKEN')
 
 openai.api_key = token 
 
+sample_code = """
+    class A_MyCode_Sample
+    {
+        A_MyCode_Sample();
+        
+        protected:
+        
+            void setValue ( int val ) { m_MyVar = val; }
+            
+        private:
+        
+            int m_MyVar = 2;    
+    };
+"""
 
 prompt = """
 
-Create a c++ class using this democode
+Please review the sample_code for readability based on the context_code provided and don't write the context_code
+and give suggestions for the sample_code only
 
 """
 
+prompt += "context_code:"
 file_list = ['ParentClass.h','ParentClass.cpp','ChildClass.h','ChildClass.cpp']
 
 for file in file_list:
@@ -36,7 +52,7 @@ response = openai.ChatCompletion.create(
   model="gpt-4",
   messages=[
         {"role": "system", "content": "You are a very kind programmer."},
-        {"role": "user", "content": prompt},
+        {"role": "user", "content": prompt + sample_code},
         # {"role": "assistant", "content": init_response},
         # {"role": "user", "content": elab}
     ]

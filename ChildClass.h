@@ -6,10 +6,12 @@
 namespace GlobalContextClassNameSpace
 {
   
+  // only use this context when defined
   class ChildClass: public ParentClass
   {
-      ChildClass(){};
-      ~ChildClass(){};
+    public:
+      ChildClass();
+      virtual ~ChildClass(){};
       
       virtual int getValue() const override;
   };

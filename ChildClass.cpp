@@ -2,7 +2,8 @@
 
 using namespace GlobalContextNameSpace;
 
-ChildClass::ChildClass() 
+ChildClass::ChildClass()
+: ParentClass()
 {
     // Constructor implementation (if needed)
 }
