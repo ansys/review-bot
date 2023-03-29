@@ -14,6 +14,9 @@ import os
 import sys
 import openai
 
+THIS_DIR = os.path.abspath(os.path.dirname(__file__))
+DST_FOLDER_OUTPUT = THIS_DIR + '/git_diff_output/'
+
 if not os.environ.get('TOKEN'):
     print('TOKEN environment variable is not defined.')
     sys.exit(0)
@@ -31,16 +34,19 @@ prompt_query1 = """"
 prompt_query2 = """"
     Please review the sample_code for readability and give suggestions for the sample_code only
     """
-file_list = ['diff_output.txt']
+    
+os.chdir(DST_FOLDER_OUTPUT)
+file_list = os.listdir(os.curdir)  
+  
+# file_list = ['diff_output2.txt']
 
-def generate_prompt(prompt_query: str, file_list: list) -> str:
+def generate_prompt(prompt_query: str, file: str) -> str:
     prompt = prompt_query
     
     prompt += "sample_code:"
-    for file in file_list:
-        with open(file, 'r') as file:
-            data = file.read().replace('\n', '')
-        prompt += data
+    with open(file, 'r') as file:
+        data = file.read().replace('\n', '')
+    prompt += data
     
     #prompt += "some basic rules to check:"
     #prompt += "comments"
@@ -60,12 +66,24 @@ def call_openai(prompt: str):
     )
 
     text = response['choices'][0].message.content
-    print(text)
+    #print(text)
 
 
 print("----------------------------LOGICAL ISSUES: ----------------------------------------")
-prompt = generate_prompt(prompt_query1, file_list)
-call_openai(prompt)
+
+for item in file_list:
+    if not os.path.isfile(item):
+        continue
+        
+    source_file =  DST_FOLDER_OUTPUT + item
+    file_size = os.path.getsize(item)
+    if os.stat(source_file).st_size == 0 or os.stat(source_file).st_size > 3000:
+        continue
+    print(f'{item}: {file_size}')
+     
+    prompt = generate_prompt(prompt_query1, source_file)
+    print(prompt)
+    call_openai(prompt)
 
 #print("----------------------------READABILITY ENHANCEMENT: ----------------------------------------")
 #prompt = generate_prompt(prompt_query2, file_list)
