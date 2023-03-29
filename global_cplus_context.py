@@ -32,13 +32,14 @@ prompt_query1 = """"
     """
 
 prompt_query_for_split_file = """"
-       Please review the sample_code for logical mistakes and don't include logical mistakes when it happens in the last few lines in the file and only comment on these and don't output any readability suggestions
+       Please review the sample_code for logical mistakes and don't include logical mistakes when it happens in the last line in the file and only comment on these and don't output any readability suggestions
     """
     
 os.chdir(DST_FOLDER_OUTPUT)
-#file_list = os.listdir(os.curdir)  
+file_list = os.listdir(os.curdir)  
   
-file_list = ['PrimeFileIO.cpp.gitdiff.txt']
+#file_list = ['PrimeFileIO.cpp.gitdiff.txt_split_file_700.txt']
+MAX_FILE_SIZE = 8000 # 8000
 
 def generate_prompt(prompt_query: str, file: str) -> str:
     prompt = prompt_query
@@ -67,10 +68,10 @@ def call_openai(prompt: str):
 
     text = response['choices'][0].message.content
     print(text)
-    print("\n\n")
+    print("\n")
 
 
-print("----------------------------LOGICAL ISSUES: ----------------------------------------")
+print("---------------------------------------- LOGICAL ISSUES: ----------------------------------------")
 
 index = 0
 for item in file_list:
@@ -79,6 +80,10 @@ for item in file_list:
     index = index + 1
     #if index > 1:
     #    continue  
+     
+    file_size = os.path.getsize(item)
+    print("----------------------------------------------------------------------------------------------------")
+    print(f'{item}: {file_size}')
     
     substring = ".h"
     if substring in item:
@@ -86,21 +91,20 @@ for item in file_list:
         continue
           
     source_file =  DST_FOLDER_OUTPUT + item
-    file_size = os.path.getsize(item)
-    print("------------------------------------------------------------------------------------------")
-    print(f'{item}: {file_size}')
-    
+       
     list_small_files = list()
     
-    if os.stat(source_file).st_size > 8000:
-        lines_per_file = 500
+    if os.stat(source_file).st_size > MAX_FILE_SIZE:
+        print(f'{item}: BIG FILE')
+        lines_per_file = 700
         smallfile = None
-        with open(source_file) as bigfile:
+        split_file = source_file
+        with open(split_file) as bigfile:
             for lineno, line in enumerate(bigfile):
                 if lineno % lines_per_file == 0:
                     if smallfile:
                         smallfile.close()
-                    small_filename = 'small_file_{}.txt'.format(lineno + lines_per_file)
+                    small_filename = item + '_split_file_{}.txt'.format(lineno + lines_per_file)
                     smallfile = open(small_filename, "w")
                     list_small_files.append(small_filename)
                 smallfile.write(line)
@@ -115,9 +119,10 @@ for item in file_list:
         call_openai(prompt)
     else:
        for small_source_file in list_small_files: 
-           print(f'{small_source_file}')
+           print(f'split_file {item}: {small_source_file}')
            prompt = generate_prompt(prompt_query_for_split_file, small_source_file)
            call_openai(prompt)
+           # os.remove(small_source_file)
 
 
 
