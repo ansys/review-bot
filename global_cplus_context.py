@@ -31,14 +31,14 @@ prompt_query1 = """"
     Please review the sample_code for logical mistakes and only comment on these and don't output any readability suggestions
     """
 
-prompt_query2 = """"
-    Please review the sample_code for readability and give suggestions for the sample_code only
+prompt_query_for_split_file = """"
+       Please review the sample_code for logical mistakes and don't include logical mistakes when it happens in the last few lines in the file and only comment on these and don't output any readability suggestions
     """
     
 os.chdir(DST_FOLDER_OUTPUT)
-file_list = os.listdir(os.curdir)  
+#file_list = os.listdir(os.curdir)  
   
-#file_list = ['PrimeFileIO.cpp.gitdiff.txt']
+file_list = ['PrimeFileIO.cpp.gitdiff.txt']
 
 def generate_prompt(prompt_query: str, file: str) -> str:
     prompt = prompt_query
@@ -87,14 +87,37 @@ for item in file_list:
           
     source_file =  DST_FOLDER_OUTPUT + item
     file_size = os.path.getsize(item)
-    if os.stat(source_file).st_size == 0 or os.stat(source_file).st_size > 5000:
-        continue
     print("------------------------------------------------------------------------------------------")
     print(f'{item}: {file_size}')
-     
-    prompt = generate_prompt(prompt_query1, source_file)
-    call_openai(prompt)
-
+    
+    list_small_files = list()
+    
+    if os.stat(source_file).st_size > 8000:
+        lines_per_file = 500
+        smallfile = None
+        with open(source_file) as bigfile:
+            for lineno, line in enumerate(bigfile):
+                if lineno % lines_per_file == 0:
+                    if smallfile:
+                        smallfile.close()
+                    small_filename = 'small_file_{}.txt'.format(lineno + lines_per_file)
+                    smallfile = open(small_filename, "w")
+                    list_small_files.append(small_filename)
+                smallfile.write(line)
+            if smallfile:
+                smallfile.close()
+                
+    elif os.stat(source_file).st_size == 0:
+        continue
+    
+    if len(list_small_files) == 0:
+        prompt = generate_prompt(prompt_query1, source_file)
+        call_openai(prompt)
+    else:
+       for small_source_file in list_small_files: 
+           print(f'{small_source_file}')
+           prompt = generate_prompt(prompt_query_for_split_file, small_source_file)
+           call_openai(prompt)
 
 
 
