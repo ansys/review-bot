@@ -38,7 +38,7 @@ prompt_query2 = """"
 os.chdir(DST_FOLDER_OUTPUT)
 file_list = os.listdir(os.curdir)  
   
-# file_list = ['diff_output2.txt']
+#file_list = ['PrimeFileIO.cpp.gitdiff.txt']
 
 def generate_prompt(prompt_query: str, file: str) -> str:
     prompt = prompt_query
@@ -66,27 +66,35 @@ def call_openai(prompt: str):
     )
 
     text = response['choices'][0].message.content
-    #print(text)
+    print(text)
+    print("\n\n")
 
 
 print("----------------------------LOGICAL ISSUES: ----------------------------------------")
 
+index = 0
 for item in file_list:
     if not os.path.isfile(item):
         continue
-        
+    index = index + 1
+    #if index > 1:
+    #    continue  
+    
+    substring = ".h"
+    if substring in item:
+        print(f'ChatGPT cannot analyse logical issues in Header files')
+        continue
+          
     source_file =  DST_FOLDER_OUTPUT + item
     file_size = os.path.getsize(item)
-    if os.stat(source_file).st_size == 0 or os.stat(source_file).st_size > 3000:
+    if os.stat(source_file).st_size == 0 or os.stat(source_file).st_size > 5000:
         continue
+    print("------------------------------------------------------------------------------------------")
     print(f'{item}: {file_size}')
      
     prompt = generate_prompt(prompt_query1, source_file)
-    print(prompt)
     call_openai(prompt)
 
-#print("----------------------------READABILITY ENHANCEMENT: ----------------------------------------")
-#prompt = generate_prompt(prompt_query2, file_list)
-#call_openai(prompt)
+
 
 
