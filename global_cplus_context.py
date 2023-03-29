@@ -31,7 +31,7 @@ prompt_query1 = """"
 prompt_query2 = """"
     Please review the sample_code for readability and give suggestions for the sample_code only
     """
-file_list = ['sample_code.cpp']
+file_list = ['diff_output.txt']
 
 def generate_prompt(prompt_query: str, file_list: list) -> str:
     prompt = prompt_query

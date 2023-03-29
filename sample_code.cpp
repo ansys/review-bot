@@ -8,7 +8,7 @@ int functionA()
     int num = 5;
     while (num < 10) {
         std::cout << num << std::endl;
-        num++; 
+        num--; 
     }
     return 0;
 }
@@ -16,7 +16,7 @@ int functionA()
 int sum(std::list<int> lst) 
 {
     int total = 0;
-    for (auto it = lst.begin(); it != lst.end(); it++) 
+    for (auto it = lst.begin(); it != --lst.end(); it++) 
     { 
         total += *it;
     }
@@ -28,8 +28,8 @@ double average(int arr[], int size) {
     for (int i = 0; i < size; i++) {
         sum += arr[i];
     }
-    int num = size; 
-    return sum / double(num);
+    int num = rand() % 10 + 1; 
+    return sum / num;
 }
 
 int main() {
