@@ -58,7 +58,7 @@ def call_openai(prompt: str):
     response = openai.ChatCompletion.create(
         model="gpt-4",
         messages=[
-            {"role": "system", "content": "You are a kind c++ reviewer."},
+            {"role": "system", "content": "You are a kind c++ reviewer giving very short answers."},
             {"role": "user", "content": prompt},
             # {"role": "assistant", "content": init_response},
             # {"role": "user", "content": elab}
