@@ -1,3 +1,0 @@
-chatGPTInstruction:1050+
-+PrimeFileIO::~PrimeFileIO() {}
-\ No newline at end of file

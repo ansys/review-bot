@@ -1,9 +1,0 @@
-chatGPTInstruction:427+
-+double PrimeFileIO::ReadDouble(FILE *f)
-+{
-+    // TGEnv env = m_model->GetTGEnv();
-+
-+    double val = 0;
-+    // Prime_Protect_Read_Double(env, f, &val);
-+    return val;
-+}

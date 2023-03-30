@@ -1,8 +1,0 @@
-chatGPTInstruction:103+
-+void PrimeFileIO::RunPrimeShellScript(std::shared_ptr<OccDataStructure> m_occData)
-+{
-+    std::string command_name = "sh prime/runPrimeImage_" + std::to_string(m_meshConstruction->uniqueBaseIdentifier()) + ".sh";
-+    int returnValue = std::system(command_name.c_str());
-+    if (m_occData->isAddDebugInfoFlag() >= 5)
-+        m_occData->addMsg("########################################## The prime mesher returned status: " + std::to_string(returnValue));
-+}
