@@ -48,7 +48,7 @@ jobs:
           pytest-extra-args: "--cov=review_bot --cov-report=term --cov-report=html:.cov/html"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPEN_AI_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPEN_AI_TOKEN: ${{ secrets.OPEN_AI_TOKEN }}
 
   # doc-build:
   #   name: "Build documentation"
