@@ -1,8 +1,9 @@
 import logging
-import os
 import threading
 
 import requests
+
+from review_bot.misc import _get_gh_token
 
 LOG = logging.getLogger(__name__)
 LOG.setLevel("DEBUG")
@@ -19,14 +20,6 @@ def _fetch_file_content(file_data, headers):
         file_data["file_text"] = requests.get(content["download_url"], timeout=10).text
     else:
         raise RuntimeError("Error fetching file content")
-
-
-def _get_token():
-    """Return the github access token from the GITHUB_TOKEN environment variable."""
-    access_token = os.environ.get("GITHUB_TOKEN")
-    if access_token is None:
-        raise OSError('Missing "GITHUB_TOKEN" environment variable')
-    return access_token
 
 
 def get_changed_files_and_contents(owner, repo, pull_number):
@@ -74,18 +67,23 @@ def get_changed_files_and_contents(owner, repo, pull_number):
     'print("Hello, world!")\n'
 
     """
-    access_token = _get_token()
-    url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pull_number}/files"
-    headers = {"Authorization": f"Bearer {access_token}"}
+    access_token = _get_gh_token()
+    url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pull_number}"
+    # url = f"https://github.com/{owner}/{repo}/pull/{pull_number}.diff"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        # "Content-type": "application/vnd.github.diff",
+    }
 
     response = requests.get(url, headers=headers, timeout=10)
-
     if response.status_code != 200:
-        raise RuntimeError(f"Error fetching pull request files: {response.status_code}")
+        raise RuntimeError(
+            f"Error fetching pull request files from:\n{url}\n\n{response.status_code}"
+        )
 
     files = response.json()
 
-    access_token = _get_token()
+    access_token = _get_gh_token()
     url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pull_number}/files"
     headers = {"Authorization": f"Bearer {access_token}"}
 
@@ -101,13 +99,12 @@ def get_changed_files_and_contents(owner, repo, pull_number):
     for file_data in files:
         LOG.info("Filename: %s", file_data["filename"])
         LOG.info("Status: %s", file_data["status"])
-        LOG.info("Content:")
 
-        t = threading.Thread(target=_fetch_file_content, args=(file_data, headers))
-        threads.append(t)
-        t.start()
+        thread = threading.Thread(target=_fetch_file_content, args=(file_data, headers))
+        threads.append(thread)
+        thread.start()
 
-    for t in threads:
-        t.join()
+    for thread in threads:
+        thread.join()
 
     return files
