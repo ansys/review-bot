@@ -1,3 +1,4 @@
+"""Functions to interface with OpenAI."""
 import logging
 from typing import Dict, List
 
@@ -15,8 +16,7 @@ OPEN_AI_MODEL = "gpt-4"
 
 
 def review_patch(owner, repo, pr, use_src=False, filter_filename=None):
-    """
-    Review a patch in a pull request and generate suggestions for improvement.
+    """Review a patch in a pull request and generate suggestions for improvement.
 
     Parameters
     ----------

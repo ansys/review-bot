@@ -23,14 +23,28 @@ hackathon-review-bot
    :target: https://github.com/psf/black
    :alt: Black
 
+Overview
+--------
 
-Hackathon Review bot
+``review-bot`` is a Python library that allows users to automatically generate
+suggestions and improvements for patches in GitHub pull requests by leveraging
+the power of OpenAI. The library generates suggestions for patch improvements,
+considering different aspects such as code style, logical errors, and other
+possible issues. This makes the code review process smoother and more
+efficient, ensuring that your codebase remains high-quality, maintainable, and
+adheres to best practices.
+
+Install with:
+
+.. code:: bash
+
+   pip install review-bot
 
 
-How to install
---------------
+Installation - Details
+----------------------
 
-At least two installation modes are provided: user and developer.
+At two installation modes are provided: user and developer.
 
 For users
 ^^^^^^^^^

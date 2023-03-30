@@ -1,6 +1,4 @@
-"""
-OpenAI LLM powered Review-bot.
-"""
+"""OpenAI LLM powered Review-bot."""
 
 try:
     import importlib.metadata as importlib_metadata
