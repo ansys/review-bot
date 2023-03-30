@@ -1,0 +1,82 @@
+chatGPTInstruction:479+
++static void fillConnectForCell(size_t iCell, bool right_cell, cm2::UIntMat &connectM, const cm2::UIntMat &facePrimeData, size_t iFace,
++                               std::vector<int> &cellCount)
++{
++
++    if (cellCount[iCell] == 0)
++    {
++        if (right_cell)
++        {
++            for (size_t j = 0; j < 3; j++)
++            {
++                connectM(j, iCell) = facePrimeData(j, iFace);
++            }
++            cellCount[iCell] = 3;
++        }
++        else
++        {
++            for (size_t j = 1; j <= 3; j++)
++            {
++                connectM(j, iCell) = facePrimeData(j - 1, iFace);
++            }
++            cellCount[iCell] = -3;
++        }
++    }
++    else if (cellCount[iCell] == 3)
++    {
++        for (size_t j = 0; j < 3; j++)
++        {
++            bool found = false;
++            for (size_t k = 0; k < 3; k++)
++            {
++                if (facePrimeData(j, iFace) == connectM(k, iCell))
++                {
++                    found = true;
++                    break;
++                }
++            }
++            if (!found)
++            {
++                /*if (iCell == 0)
++                {
++                    printf("alreay cell ids %d %d %d and new node %d\n", connectM(0, iCell), connectM(1, iCell), connectM(2, iCell), facePrimeData(j,
++                iFace));
++                }*/
++                connectM(3, iCell) = facePrimeData(j, iFace);
++                cellCount[iCell] = 4;
++                /*if (iCell == 0)
++                {
++                    printf("alreay cell ids %d %d %d and new node %d\n", connectM(0, iCell), connectM(1, iCell), connectM(2, iCell), connectM(3,
++                iCell));
++                }*/
++                break;
++            }
++        }
++    }
++    else if (cellCount[iCell] == -3)
++    {
++        for (size_t j = 0; j < 3; j++)
++        {
++            bool found = false;
++            for (size_t k = 1; k <= 3; k++)
++            {
++                if (facePrimeData(j, iFace) == connectM(k, iCell))
++                {
++                    found = true;
++                    break;
++                }
++            }
++            if (!found)
++            {
++                /*if (iCell == 0)
++                {
++                    printf("alreay cell ids %d %d %d and new node %d\n", connectM(0, iCell), connectM(1, iCell), connectM(2, iCell), facePrimeData(j,
++                iFace));
++                }*/
++                connectM(0, iCell) = facePrimeData(j, iFace);
++                cellCount[iCell] = 4;
++                break;
++            }
++        }
++    }
++}

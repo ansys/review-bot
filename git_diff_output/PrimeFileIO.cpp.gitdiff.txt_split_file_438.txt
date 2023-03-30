@@ -1,0 +1,13 @@
+chatGPTInstruction:388+
++/* f format is 1 2 3 4)*/
++void PrimeFileIO::ReadOpenedList(FILE *f, char *token, std::vector<int> &list)
++{
++    ReadNextToken(f, token);
++    while (token[0] != ')')
++    {
++        list.push_back(atoi(token));
++        ReadNextToken(f, token);
++    }
++
++    return;
++}

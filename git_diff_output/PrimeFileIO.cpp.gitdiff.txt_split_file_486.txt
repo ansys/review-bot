@@ -1,0 +1,9 @@
+chatGPTInstruction:436+
++int PrimeFileIO::ReadInt(FILE *f)
++{
++    // TGEnv env = m_model->GetTGEnv();
++
++    int val = 0;
++    // Prime_Protect_Read_Dint(env, f, &val);
++    return val;
++}

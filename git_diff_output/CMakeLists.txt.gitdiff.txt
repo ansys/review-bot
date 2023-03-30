@@ -1,0 +1,44 @@
+diff --git a/mesh/CMakeLists.txt b/mesh/CMakeLists.txt
+index 4c3c187..51bda9d 100644
+--- a/mesh/CMakeLists.txt
++++ b/mesh/CMakeLists.txt
+@@ -215,6 +215,21 @@ if(NOT CadEx_FOUND OR CAD_FORCE_DATAKIT)
+     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCAD_HAS_DATAKIT")
+ endif()
+ 
++if(DEFINED ENV{PRIME_MESHER_VER})
++    set(PRIME_VER "20.01.23-centos_7_2.7")
++    message(STATUS "Found PRIME Version at: ${PRIME_VER}")
++    set(PRIME_SOURCE_LIB /opt/onscale/pyprimemesh-v${PRIME_VER}/pyprimemesh-v${PRIME_VER}.tar)
++    message(STATUS "Found PRIME_SOURCE_LIB: ${PRIME_SOURCE_LIB}")
++    set(PRIME_TARGET_LIB ${CMAKE_BINARY_DIR}/lib/pyprimemesh.tar)
++    set(PRIME_TARGET_DES ${CMAKE_BINARY_DIR}/lib)
++    message(STATUS "PRIME_TARGET_LIB: ${PRIME_TARGET_LIB}")
++    file(COPY ${PRIME_SOURCE_LIB} DESTINATION ${PRIME_TARGET_DES})
++    set(PRIME_LIB ${CMAKE_BINARY_DIR}/lib/pyprimemesh-v${PRIME_VER}.tar)
++    file(RENAME ${PRIME_LIB} ${PRIME_TARGET_LIB})
++else()
++    message(STATUS "No PRIME_MESHER_VER defined")
++endif()
++
+ # add CM2 mesher library
+ if(DEFINED ENV{CM2_VER})
+     message(STATUS "Use cm2 version: " $ENV{CM2_VER})
+@@ -305,7 +320,7 @@ find_library(LIB_ANSYS_PRIME_MESH_DIR PrimeMesh PATHS "$ENV{ANSYS_PRIME_MESH_DIR
+ find_path(INC_ANSYS_PRIME_MESH PrimeModel PATHS "$ENV{ANSYS_PRIME_MESH_DIR}/include")
+ 
+ if(NOT LIB_ANSYS_PRIME_MESH_DIR)
+-    message(STATUS "OnScale::CAD -> Won't use Ansys Prime Mesher.")
++    message(STATUS "OnScale::CAD -> Won't use Ansys Prime Mesher dlls.")
+ else()
+     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCAD_HAS_ANSYS_PRIME")
+ 
+@@ -463,6 +478,8 @@ if(NOT ${OnScale_CAD_LITE})
+         Cm2Construction3D.h
+         Cm2ConstructionTet3D.cpp
+         Cm2ConstructionTet3D.h
++        PrimeFileIO.h
++        PrimeFileIO.cpp
+         PrimeConstructionTet3D.cpp
+         PrimeConstructionTet3D.h
+         AnsysConstruction3D.cpp

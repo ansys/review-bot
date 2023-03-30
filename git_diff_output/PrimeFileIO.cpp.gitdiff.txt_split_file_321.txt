@@ -1,0 +1,46 @@
+chatGPTInstruction:271+
++/*ReadNextToken*/
++char *PrimeFileIO::ReadNextToken(FILE *f, char *token, int *max_len)
++{
++    int i;
++    // Assert(m_model->GetTGEnv(), NULLP(max_len) || (*max_len) > 0);
++    while ((i = getc(f)) != EOF)
++    {
++        switch ((char)i)
++        {
++        case ' ':
++            break;
++        case '(':
++        case ')':
++            token[0] = (char)i;
++            token[1] = '\0';
++            return token;
++        case EOF:
++            token[0] = '\0';
++            return token;
++        case '.':
++            break;
++        case '\'':
++            break;
++        case '"':
++            if (!NULLP(max_len) && *max_len > 0)
++            {
++                return ReadStringLarge(f, token, max_len);
++            }
++            else
++            {
++                ReadString(f, token);
++                return token;
++            }
++        default:
++            if (isprint((char)i))
++            {
++                token[0] = (char)i;
++                ReadToken(f, token + 1);
++                return token;
++            }
++        }
++    }
++    return token;
++    /* not reached */
++}

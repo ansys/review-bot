@@ -1,0 +1,9 @@
+chatGPTInstruction:570+
++static void flushBinDoubles(FILE *f, int n, int size_of_bin_double, double *tmp_data)
++{
++    for (int i = 0; i < n; i++)
++    {
++        int ret_ = fread(tmp_data, size_of_bin_double, 1, f);
++        std::ignore = ret_;
++    }
++}

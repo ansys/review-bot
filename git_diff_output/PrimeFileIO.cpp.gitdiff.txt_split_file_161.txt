@@ -1,0 +1,17 @@
+chatGPTInstruction:111+
++std::string PrimeFileIO::primeFolderPath()
++{
++    // here you can add the "prime" subfolder logic,
++    // and when you call this function in all places where you require the "path" in which the prime files are stored,
++    // then we can easy change this path to whatever we like and it will still work.
++    /*create a prime directory to store all the debug file in it*/
++    int ret_d = CreateDirectory("prime");
++    if (ret_d)
++        std::cout << "########################################## the prime debug directory has been successfully created -> " << std::endl;
++
++    CreateDirectory("prime");
++
++    std::string prime_path = m_meshConstruction->occData()->getDebugOutputPath() + "/prime";
++
++    return prime_path;
++}

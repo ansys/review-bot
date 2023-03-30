@@ -1,0 +1,15 @@
+chatGPTInstruction:344+
++char *PrimeFileIO::ReadNextTokenLarge(FILE *f, char *token, int *max_len) { return ReadNextToken(f, token, max_len); }
++
++/* move file pointer just past next opening paren */
++void PrimeFileIO::ReadStartList(FILE *f, char *token)
++{
++    ReadNextToken(f, token);
++
++    if (token[0] == '(')
++        return;
++    // else if (token[0] == EOF)
++    // EOF_Error(env);    //error out things in onscale way
++    // else
++    // Error(env, "unexpected character read.\n");
++}

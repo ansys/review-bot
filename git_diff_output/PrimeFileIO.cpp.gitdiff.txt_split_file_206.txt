@@ -1,0 +1,17 @@
+chatGPTInstruction:156+
++bool PrimeFileIO::CreateDirectory(const std::string &dirName)
++{
++    std::error_code err;
++    if (!std::filesystem::create_directories(dirName, err))
++    {
++        if (std::filesystem::exists(dirName))
++        {
++            return true; // the folder probably already existed
++        }
++
++        std::cout << "createDirectory: failed to create [" << dirName.c_str() << "], err:" << err.message().c_str() << std::endl;
++        return false;
++    }
++
++    return true;
++}

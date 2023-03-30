@@ -1,0 +1,9 @@
+chatGPTInstruction:561+
++static void flushBinInts(FILE *f, int n, int size_of_bin_int, int *tmp_data)
++{
++    for (int i = 0; i < n; i++)
++    {
++        int ret_ = fread(tmp_data, size_of_bin_int, 1, f);
++        std::ignore = ret_;
++    }
++}

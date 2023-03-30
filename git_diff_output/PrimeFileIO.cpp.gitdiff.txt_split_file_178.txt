@@ -1,0 +1,14 @@
+chatGPTInstruction:128+
++std::string PrimeFileIO::dockerWorkDir()
++{
++    if (const char *used_dood_env = std::getenv("USE_DOOD")) // Docker outside of Docker
++    {
++        bool bUseDood;
++        std::stringstream ss(used_dood_env);
++        ss >> std::boolalpha >> bUseDood;
++        if (bUseDood)
++            return m_meshConstruction->occData()->getAbsoluteDebugOutputPath() + "/prime";
++    }
++
++    return "/local/workdir";
++}

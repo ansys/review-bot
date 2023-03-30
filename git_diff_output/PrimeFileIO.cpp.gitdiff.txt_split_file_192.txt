@@ -1,0 +1,14 @@
+chatGPTInstruction:142+
++bool PrimeFileIO::isDOOD()
++{
++    // returns true when we are running a Docker outside docker environment
++    bool bUseDood = false;
++    if (const char *used_dood_env = std::getenv("USE_DOOD")) // Docker outside of Docker
++    {
++
++        std::stringstream ss(used_dood_env);
++        ss >> std::boolalpha >> bUseDood;
++    }
++
++    return bUseDood;
++}

@@ -1,0 +1,8 @@
+chatGPTInstruction:463+
++/* f format is (1 2 3 4)*/
++void PrimeFileIO::ReadList(FILE *f, char *token, std::vector<std::string> &list)
++{
++    if (!ReadNextTokenAndCheckStartList(f, token))
++        return;
++    ReadOpenedList(f, token, list);
++}

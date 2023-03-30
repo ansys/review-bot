@@ -1,0 +1,10 @@
+chatGPTInstruction:445+
++bool PrimeFileIO::ReadNextTokenAndCheckStartList(FILE *f, char *token)
++{
++    ReadNextToken(f, token);
++    if (token[0] == '(')
++    {
++        return true;
++    }
++    return false;
++}

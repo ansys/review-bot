@@ -1,0 +1,281 @@
+chatGPTInstruction:635+
++int PrimeFileIO::ReadPrimeData(FILE *f, cm2::tetramesh_iso::mesher::data_type &tetData, std::shared_ptr<OccDataStructure> m_occData,
++                               bool &foundDiscardedFaces)
++{
++    // reading the pmdat file f and populating the data to empty tetData->cm2 structure
++
++    char token[MAX_NAME_LENGTH];
++    std::string line;
++    cm2::UIntMat facePrimeData;
++    int ret_;
++    m_numberOfBoundaryFaces = 0;
++    int sizeof_prime_real = -1;
++    int sizeof_prime_elm_index = -1;
++
++    int sectionid;
++
++    ReadNextToken(f, token);
++    while (token[0] == '(')
++    {
++
++        NreadNextToken(f, token, 1);
++        sectionid = atoi(token);
++        bool binary = false;
++
++        if (sectionid > 1000)
++        {
++            binary = true;
++            // printf("we reading binary...\n");
++            sectionid = sectionid % 1000;
++        }
++        if (sectionid == 10)
++        {
++            NreadNextToken(f, token, 2);
++            int primeColorId = std::stoi(token, 0, 16);
++
++            if (primeColorId == 0)
++            {
++                NreadNextToken(f, token, 2);
++                m_numberOfNodes = std::stoi(token, 0, 16);
++                FlushReadList(f);
++
++                tetData.pos.reserve(3, m_numberOfNodes);
++                printf("the number of node : %d\n", m_numberOfNodes);
++            }
++            else
++            {
++                /*CODE FOR ACCESSING NODE THREAD DETAILS*/
++                cm2::DoubleVec coord(3);
++                threadInfo.id = primeColorId;
++
++                ret_ = fscanf(f, "%x%x%d%d", &threadInfo.start, &threadInfo.end, &threadInfo.type, &threadInfo.etype);
++                nodeInfoVector.push_back(threadInfo);
++
++                FlushReadList(f);
++                printf("node->id : %d node->start : %d node->end : %d \n", threadInfo.id, threadInfo.start, threadInfo.end);
++
++                if (ReadNextTokenAndCheckStartList(f, token))
++                {
++                    for (unsigned int i = threadInfo.start; i <= threadInfo.end; i++)
++                    {
++                        if (!binary)
++                        {
++                            ret_ = fscanf(f, "%lf%lf%lf", coord.data(), coord.data() + 1, coord.data() + 2); // look into google for assert
++                        }
++                        else
++                        {
++                            ret_ = fread(coord.data(), sizeof_prime_real, 3, f);
++                        }
++
++                        tetData.pos.push_back(coord);
++                    }
++
++                    FlushReadList(f);
++                }
++            }
++        }
++        else if (sectionid == 11)
++        {
++            NreadNextToken(f, token, 2);
++
++            if (std::stoi(token, 0, 16) == 0)
++            {
++
++                NreadNextToken(f, token, 2);
++                m_numberOfEdges = std::stoi(token, 0, 16);
++                FlushReadList(f);
++                printf("the number of edges : %d\n", m_numberOfEdges);
++            }
++        }
++        else if (sectionid == 12)
++        {
++            NreadNextToken(f, token, 2);
++
++            if (std::stoi(token, 0, 16) == 0)
++            {
++                NreadNextToken(f, token, 2);
++                m_numberOfCells = std::stoi(token, 0, 16);
++
++                FlushReadList(f);
++                printf("the number of cells : %d\n", m_numberOfCells);
++            }
++            else
++            {
++                /*CODE FOR ACCESSING CELL THREAD DETAILS*/
++
++                threadInfo.id = std::stoi(token, 0, 16);
++
++                ret_ = fscanf(f, "%x%x%d%d", &threadInfo.start, &threadInfo.end, &threadInfo.type, &threadInfo.etype);
++                cellInfoVector.push_back(threadInfo);
++                printf("the cell id is %d\n", threadInfo.id);
++
++                for (unsigned int i = threadInfo.start; i <= threadInfo.end; i++)
++                {
++                    tetData.colors.push_back(threadInfo.id);
++                }
++                FlushReadList(f);
++            }
++        }
++        else if (sectionid == 13)
++        {
++            NreadNextToken(f, token, 2);
++
++            if (std::stoi(token, 0, 16) == 0)
++            {
++
++                NreadNextToken(f, token, 2);
++                m_numberOfFaces = std::stoi(token, 0, 16);
++
++                FlushReadList(f);
++                facePrimeData.reserve(5, m_numberOfFaces);
++                printf("the number of faces : %d\n", m_numberOfFaces);
++            }
++            else
++            {
++                /*CODE FOR ACCESSING FACE THREAD DETAILS*/
++
++                cm2::UIntVec faceData(5);
++                threadInfo.id = std::stoi(token, 0, 16);
++
++                ret_ = fscanf(f, "%x%x%d%d", &threadInfo.start, &threadInfo.end, &threadInfo.type, &threadInfo.etype);
++                faceInfoVector.push_back(threadInfo);
++                FlushReadList(f);
++
++                ReadNextToken(f, token);
++                for (unsigned int i = threadInfo.start; i <= threadInfo.end; i++)
++                {
++                    if (!binary)
++                    {
++                        ret_ = fscanf(f, "%x%x%x%x%x", faceData.data(), faceData.data() + 1, faceData.data() + 2, faceData.data() + 3,
++                                      faceData.data() + 4);
++                    }
++                    else
++                    {
++                        for (unsigned int k = 0; k < 5; k++)
++                        {
++                            ret_ = fread(faceData.data() + k, sizeof_prime_elm_index, 1, f); // 12th element of arrray
++                        }
++                    }
++
++                    for (unsigned int k = 0; k < 5; k++)
++                    {
++                        if (faceData[k] == 0)
++                        {
++                            faceData[k] = m_numberOfCells + 10;
++                        }
++                        else
++                        {
++                            faceData[k] = faceData[k] - 1;
++                        }
++                    }
++                    for (unsigned int k = 0; k < 5; k++)
++                    {
++                        if (faceData[k] > m_numberOfCells + 10 && faceData[k] > m_numberOfNodes)
++                        {
++                            printf("We have a problem with data read at %d\n", i);
++                        }
++                    }
++                    facePrimeData.push_back(faceData);
++                    if (threadInfo.type > 2)
++                    {
++                        m_numberOfBoundaryFaces++;
++                    }
++                }
++
++                FlushReadList(f);
++            }
++        }
++        else if (sectionid == 4)
++        {
++            NreadNextToken(f, token, 11);
++            sizeof_prime_real = atoi(token);
++            NreadNextToken(f, token, 2);
++            sizeof_prime_elm_index = atoi(token);
++
++            printf(" the size of prime_real is : %d,  and the size of prime_elm_index : %d", sizeof_prime_real, sizeof_prime_elm_index);
++            FlushReadList(f);
++        }
++        else if (sectionid == 71)
++        {
++            if (binary)
++            {
++                ReadStatshBinData(f, token, sizeof_prime_elm_index, sizeof_prime_real);
++            }
++            /*if not binary, FlushReadList at end will take care of the stash data read */
++        }
++        /*else if(sectionid == 60)
++        {
++            float min_h, max_h, default1, default2;
++            NreadNextToken(f, token, 3);
++            if(token == "size-func/global-params")
++            {
++                NreadNextToken(f,token,1);
++                fscanf(f,"%f%f%f%f", &min_h , &max_h, &default1, &default2);
++                printf(" min_h : %f max_h : %f ", min_h, max_h);
++            }
++            else
++            {
++                FlushReadList(f);
++            }
++        }*/
++
++        FlushReadList(f);
++        ReadNextToken(f, token);
++    }
++
++    /*Creating connectM & connectB */
++    cm2::UIntMat connectM(4, m_numberOfCells);
++    cm2::UIntMat connectB(3, m_numberOfBoundaryFaces);
++
++    /*Creating a cellCount Vector and intiating all to zero */
++    std::vector<int> cellCount(m_numberOfCells, 0);
++
++    /*Debug prints*/
++    cout << " number of faces : " << m_numberOfFaces << " number of cells : " << m_numberOfCells << " number of nodes : " << m_numberOfNodes
++         << " number of boundary faces : " << m_numberOfBoundaryFaces << endl;
++    /*
++    std::string debug_file = occData->getDebugOutputPath() + "/afterConnectBFilled" + ".dat";
++    tetData.save(debug_file.c_str());
++    FILE* faceDataF = fopen( (occData->getDebugOutputPath() + "/" + "face_data.txt").c_str() , "w");
++    for (unsigned int i = 0; i < m_numberOfFaces; i++)
++    {
++        fprintf(faceDataF, "face data %d %d %d %d %d\n", (int)facePrimeData(0,i), (int)facePrimeData(1,i), (int)facePrimeData(2,i),
++    (int)facePrimeData(3,i), (int)facePrimeData(4,i));
++    }
++    fprintf(faceDataF, "done\n");
++    */
++
++    foundDiscardedFaces = false;
++
++    /*CURRENT CODE FOR CONNECT M >*/
++    for (unsigned int i = 0; i < m_numberOfFaces; i++)
++    {
++        unsigned int iRCell = facePrimeData(RCELL, i);
++        unsigned int iLCell = facePrimeData(LCELL, i);
++        if (iRCell > m_numberOfCells && iLCell > m_numberOfCells)
++        {
++            foundDiscardedFaces = true;
++            continue;
++        }
++        if (iRCell < m_numberOfCells)
++        {
++            fillConnectForCell(iRCell, true, connectM, facePrimeData, i, cellCount);
++        }
++        if (iLCell < m_numberOfCells)
++        {
++            fillConnectForCell(iLCell, false, connectM, facePrimeData, i, cellCount);
++        }
++    }
++
++    tetData.connectM.copy(connectM);
++
++    /*Debug file to check the status of connect B and compare it with cm2 mesher*/
++    if (m_occData->isAddDebugInfoFlag() >= 5)
++    {
++        std::string debug_file_M = m_occData->getDebugOutputPath() + "/afterConnectMFilled.debugFile" + ".dat";
++        tetData.save(debug_file_M.c_str());
++    }
++
++    std::ignore = ret_;
++    return 1;
++}

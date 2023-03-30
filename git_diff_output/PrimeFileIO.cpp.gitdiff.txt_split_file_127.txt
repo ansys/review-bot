@@ -1,0 +1,26 @@
+chatGPTInstruction:77+
++int PrimeFileIO::ReadVolumeMesh(cm2::tetramesh_iso::mesher::data_type &tetData, std::shared_ptr<OccDataStructure> m_occData,
++                                bool &foundDiscardedFaces)
++{
++    std::string path = m_meshConstruction->occData()->getDebugOutputPath();
++    m_volumeMeshFileName = "volumeMesh_" + std::to_string(m_meshConstruction->uniqueBaseIdentifier()) + "_fromPrime.pmdat";
++
++    FILE *fVol = fopen((primeFolderPath() + "/" + m_volumeMeshFileName).c_str(), "r");
++    int checkVolumeFile = access((primeFolderPath() + "/" + m_volumeMeshFileName).c_str(), F_OK);
++    if (checkVolumeFile == -1)
++    {
++        m_meshConstruction->occData()->addMsg("The Volume Mesh Prime File do not exists", CADErrorHandler::TetMeshDidNotWork);
++        return 0;
++    }
++    ReadPrimeData(fVol, tetData, m_occData, foundDiscardedFaces);
++
++    if (m_occData->isAddDebugInfoFlag() >= 5)
++    {
++        /*Debug file to view the connectB matrix*/
++        std::string debug_file = primeFolderPath() + "/remesherData_" + std::to_string(m_meshConstruction->uniqueBaseIdentifier()) + ".dat";
++        debug_file = m_occData->getDebugOutputPath() + "/afterConnectBFilled.debugFile." + ".dat";
++        tetData.save(debug_file.c_str());
++    }
++
++    return 1;
++}
