@@ -62,52 +62,6 @@ Then, you can simply execute:
 
     python -m pip install review-bot
 
-For developers
-^^^^^^^^^^^^^^
-
-Installing in developer mode allows you to modify the source and enhance it.
-
-Before contributing to the project, please refer to the `PyAnsys Developer's guide`_. You will 
-need to follow these steps:
-
-#. Start by cloning this repository:
-
-   .. code:: bash
-
-      git clone https://github.com/pyansys/pyproduct-library
-
-#. Create a fresh-clean Python environment and activate it:
-
-   .. code:: bash
-
-      # Create a virtual environment
-      python -m venv .venv
-
-      # Activate it in a POSIX system
-      source .venv/bin/activate
-
-      # Activate it in Windows CMD environment
-      .venv\Scripts\activate.bat
-
-      # Activate it in Windows Powershell
-      .venv\Scripts\Activate.ps1
-
-#. Install the project in editable mode:
-
-    .. code:: bash
-    
-      python -m pip install -e .
-    
-
-
-Raw testing
-^^^^^^^^^^^
-
-If required, you can always call the style commands (`black`_, `isort`_,
-`flake8`_...) or unit testing ones (`pytest`_) from the command line. However,
-this does not guarantee that your project is being tested in an isolated
-environment, which is the reason why tools like `tox`_ exist.
-
 
 A note on pre-commit
 ^^^^^^^^^^^^^^^^^^^^
