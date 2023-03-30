@@ -1,3 +1,4 @@
+"""Contains functions to interface with GitHub."""
 import logging
 import threading
 
@@ -23,7 +24,7 @@ def _fetch_file_content(file_data, headers):
 
 
 def get_changed_files_and_contents(owner, repo, pull_number):
-    """Retrieve the filenames, status, and contents of files changed in a GitHub PR.
+    r"""Retrieve the filenames, status, and contents of files changed in a GitHub PR.
 
     Parameters
     ----------

@@ -133,9 +133,9 @@ def add_line_numbers(patch):
 
 
 def parse_suggestions(text_block: str) -> List[Dict[str, str]]:
-    """
-    Parse a given text block containing suggestions and return a list of dictionaries
-    with keys: filename, lines, type, and text.
+    """Parse a given text block containing suggestions.
+
+    Returns a list of dictionaries with keys: filename, lines, type, and text.
 
     Parameters
     ----------
