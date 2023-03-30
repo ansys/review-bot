@@ -28,13 +28,10 @@ openai.api_key = token
 
 
 prompt_query1 = """"
-    Please review the sample_code for logical mistakes and only comment on these and don't output any readability suggestions
+    Review the sample_code for logical errors and only comment on these and don't output any readability suggestions. Don't comment on anything else.
+    Add the line number where you found the error 
     """
 
-prompt_query_for_split_file = """"
-       Please review the sample_code for logical mistakes and don't include logical mistakes when it happens in the last line in the file and only comment on these and don't output any readability suggestions
-    """
-    
 os.chdir(DST_FOLDER_OUTPUT)
 file_list = os.listdir(os.curdir)  
   
@@ -59,7 +56,7 @@ def call_openai(prompt: str):
     response = openai.ChatCompletion.create(
         model="gpt-4",
         messages=[
-            {"role": "system", "content": "You are a kind c++ reviewer giving very short answers."},
+            {"role": "system", "content": "You are a c and c++ reviewer giving very short answers."},
             {"role": "user", "content": prompt},
             # {"role": "assistant", "content": init_response},
             # {"role": "user", "content": elab}
@@ -100,6 +97,7 @@ for item in file_list:
         smallfile = None
         split_file = source_file
         closeOnNextOccation = False
+        smallFileClosed = False
         base_line_count = 0
         with open(split_file) as bigfile:
             for lineno, line in enumerate(bigfile):
@@ -116,11 +114,15 @@ for item in file_list:
                     if smallfile:
                         smallfile.write(line) # add last line
                         smallfile.close()
+                        smallFileClosed = True
                     small_filename = item + '_split_file_{}.txt'.format(lineno + lines_per_file)
                     smallfile = open(small_filename, "w")
+                    #chatGPTInstruction = "chatGPTInstruction:" + str(lineno)
+                    #smallfile.write(chatGPTInstruction)
                     list_small_files.append(small_filename)
-                smallfile.write(line)
-                base_line_count = base_line_count + 1
+                if not smallFileClosed:    
+                  smallfile.write(line)
+                  base_line_count = base_line_count + 1
             if smallfile:
                 smallfile.close()
                 
@@ -133,9 +135,9 @@ for item in file_list:
     else:
        for small_source_file in list_small_files: 
            print(f'split_file {item}: {small_source_file}')
-           prompt = generate_prompt(prompt_query_for_split_file, small_source_file)
+           prompt = generate_prompt(prompt_query1, small_source_file)
            call_openai(prompt)
-           os.remove(small_source_file)
+           # os.remove(small_source_file)
 
 
 
