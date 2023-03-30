@@ -38,7 +38,7 @@ prompt_query_for_split_file = """"
 os.chdir(DST_FOLDER_OUTPUT)
 file_list = os.listdir(os.curdir)  
   
-#file_list = ['PrimeFileIO.cpp.gitdiff.txt_split_file_700.txt']
+# file_list = ['PrimeFileIO.cpp.gitdiff.txt']
 MAX_FILE_SIZE = 8000 # 8000
 
 def generate_prompt(prompt_query: str, file: str) -> str:
@@ -96,18 +96,31 @@ for item in file_list:
     
     if os.stat(source_file).st_size > MAX_FILE_SIZE:
         print(f'{item}: BIG FILE')
-        lines_per_file = 700
+        lines_per_file = 50
         smallfile = None
         split_file = source_file
+        closeOnNextOccation = False
+        base_line_count = 0
         with open(split_file) as bigfile:
             for lineno, line in enumerate(bigfile):
-                if lineno % lines_per_file == 0:
+                lenline = len(line)
+                #print(f'{lenline} - {base_line_count}------- {lineno}:     {line}')
+                if base_line_count % lines_per_file == 0 or closeOnNextOccation:
+                    closeOnNextOccation = True
+                    if not ("+}" in line and lenline == 3) and smallfile:
+                        base_line_count = base_line_count + 1
+                        smallfile.write(line)
+                        continue 
+                    closeOnNextOccation = False
+                    base_line_count = 0
                     if smallfile:
+                        smallfile.write(line) # add last line
                         smallfile.close()
                     small_filename = item + '_split_file_{}.txt'.format(lineno + lines_per_file)
                     smallfile = open(small_filename, "w")
                     list_small_files.append(small_filename)
                 smallfile.write(line)
+                base_line_count = base_line_count + 1
             if smallfile:
                 smallfile.close()
                 
@@ -122,7 +135,7 @@ for item in file_list:
            print(f'split_file {item}: {small_source_file}')
            prompt = generate_prompt(prompt_query_for_split_file, small_source_file)
            call_openai(prompt)
-           # os.remove(small_source_file)
+           os.remove(small_source_file)
 
 
 
