@@ -23,7 +23,7 @@ def _fetch_file_content(file_data, headers):
         raise RuntimeError("Error fetching file content")
 
 
-def get_changed_files_and_contents(owner, repo, pull_number):
+def get_changed_files_and_contents(owner, repo, pull_number, gh_access_token=None):
     r"""Retrieve the filenames, status, and contents of files changed in a GitHub PR.
 
     Parameters
@@ -34,6 +34,9 @@ def get_changed_files_and_contents(owner, repo, pull_number):
         The name of the repository where the pull request was made.
     pull_number : int
         The number of the pull request to retrieve the changed files for.
+    gh_access_token : str, optional
+        GitHub token needed to communicate with the repository. By default, ``None``,
+        which means it will try to read an existing env variable named ``GITHUB_TOKEN``.
 
     Returns
     -------
@@ -68,7 +71,7 @@ def get_changed_files_and_contents(owner, repo, pull_number):
     'print("Hello, world!")\n'
 
     """
-    access_token = _get_gh_token()
+    access_token = _get_gh_token() if gh_access_token is None else gh_access_token
     url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pull_number}"
     # url = f"https://github.com/{owner}/{repo}/pull/{pull_number}.diff"
     headers = {
@@ -84,10 +87,8 @@ def get_changed_files_and_contents(owner, repo, pull_number):
 
     files = response.json()
 
-    access_token = _get_gh_token()
     url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pull_number}/files"
     headers = {"Authorization": f"Bearer {access_token}"}
-
     response = requests.get(url, headers=headers, timeout=10)
 
     if response.status_code != 200:
