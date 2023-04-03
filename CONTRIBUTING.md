@@ -4,13 +4,13 @@
 
 Installing in developer mode allows you to modify the source and enhance it.
 
-Before contributing to the project, please refer to the [PyAnsys Developer's guide](https://github.com/pyansys/pyproduct-library/blob/master/pyansys/docs/contributor_guide.md). You will
+Before contributing to the project, please refer to the [PyAnsys Developer's guide](https://dev.docs.pyansys.com/). You will
 need to follow these steps:
 
 1. Start by cloning this repository:
 
    ```bash
-   git clone https://github.com/pyansys/pyproduct-library
+   git clone https://github.com/ansys/hackathon-review-bot
    ```
 
 2. Create a fresh-clean Python environment and activate it:
