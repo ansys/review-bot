@@ -30,7 +30,7 @@ html_theme_options = {
         "version_match": get_version_match(__version__),
     },
     "check_switcher": False,
-    "github_url": "https://github.com/ansys/hackathon-reviewer-bot",
+    "github_url": "https://github.com/ansys/hackathon-review-bot",
     "show_prev_next": False,
     "show_breadcrumbs": True,
     "additional_breadcrumbs": [
