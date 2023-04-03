@@ -1,5 +1,5 @@
-hackathon-review-bot
-====================
+Ansys Hackathon - Review bot
+============================
 
 |pyansys| |GH-CI| |codecov| |MIT| |black|
 
