@@ -11,7 +11,7 @@ LaTeXBuilder.supported_image_types = ["image/png", "image/pdf", "image/svg+xml"]
 
 
 # Project information
-project = "review-bot"
+project = "Ansys Hackathon - Review bot"
 copyright = f"(c) {datetime.now().year} ANSYS, Inc. All rights reserved"
 author = "ANSYS, Inc."
 release = version = __version__
@@ -29,6 +29,7 @@ html_theme_options = {
         "json_url": f"https://{cname}/versions.json",
         "version_match": get_version_match(__version__),
     },
+    "check_switcher": False,
     "github_url": "https://github.com/ansys/hackathon-reviewer-bot",
     "show_prev_next": False,
     "show_breadcrumbs": True,
