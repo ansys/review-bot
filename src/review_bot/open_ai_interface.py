@@ -15,7 +15,9 @@ LOG.setLevel("DEBUG")
 OPEN_AI_MODEL = "gpt-4"
 
 
-def review_patch(owner, repo, pr, use_src=False, filter_filename=None):
+def review_patch(
+    owner, repo, pr, use_src=False, filter_filename=None, gh_access_token=None
+):
     """Review a patch in a pull request and generate suggestions for improvement.
 
     Parameters
@@ -31,6 +33,9 @@ def review_patch(owner, repo, pr, use_src=False, filter_filename=None):
         not for large ones.
     filter_filename : str, optional
         If set, filters out all but the file matching this string.
+    gh_access_token : str, optional
+        GitHub token needed to communicate with the repository. By default, ``None``,
+        which means it will try to read an existing env variable named ``GITHUB_TOKEN``.
 
     Returns
     -------
@@ -38,7 +43,9 @@ def review_patch(owner, repo, pr, use_src=False, filter_filename=None):
         A dictionary containing suggestions for the reviewed patch.
     """
     # Fetch changed files and contents
-    changed_files = get_changed_files_and_contents(owner, repo, pr)
+    changed_files = get_changed_files_and_contents(
+        owner, repo, pr, gh_access_token=gh_access_token
+    )
 
     # assemble suggestions
     suggestions = []
