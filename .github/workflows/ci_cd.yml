@@ -125,13 +125,13 @@ jobs:
           cname: ${{ env.DOCUMENTATION_CNAME }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  doc-deploy-stable:
-    name: "Deploy stable documentation"
-    runs-on: ubuntu-latest
-    needs: [release]
-    if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
-    steps:
-      - uses: pyansys/actions/doc-deploy-stable@v4
-        with:
-          cname: ${{ env.DOCUMENTATION_CNAME }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+#   doc-deploy-stable:
+#     name: "Deploy stable documentation"
+#     runs-on: ubuntu-latest
+#     needs: [release]
+#     if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
+#     steps:
+#       - uses: pyansys/actions/doc-deploy-stable@v4
+#         with:
+#           cname: ${{ env.DOCUMENTATION_CNAME }}
+#           token: ${{ secrets.GITHUB_TOKEN }}
