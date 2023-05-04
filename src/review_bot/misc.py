@@ -185,6 +185,6 @@ def parse_suggestions(text_block: str) -> List[Dict[str, str]]:
         suggestions.append(suggestion)
     validate_output(
         output=suggestions,
-        schema_path="C:/Users/afernand/Documents/repositories/hackathon-review-bot/schema.json",
+        schema_path="schema.json",
     )
     return suggestions
