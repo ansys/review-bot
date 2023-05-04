@@ -1,10 +1,12 @@
 """Miscellaneous functions."""
 
+import json
 import logging
 import os
 import re
 from typing import Dict, List
 
+from jsonschema import validate
 import openai
 
 LOG = logging.getLogger(__name__)
@@ -27,9 +29,7 @@ def _set_open_ai_token():
     openai.api_key = access_token
 
 
-def open_logger(
-    loglevel="DEBUG", formatstr="%(name)-20s - %(levelname)-8s - %(message)s"
-):
+def open_logger(loglevel="DEBUG", formatstr="%(name)-20s - %(levelname)-8s - %(message)s"):
     """Start logging to standard output.
 
     Parameters
@@ -132,6 +132,21 @@ def add_line_numbers(patch):
     return "\n".join(output_lines)
 
 
+def validate_output(output: List, schema_path: str):
+    """_summary_
+
+    Parameters
+    ----------
+    output : List
+        Formatted output from LLM results.
+    schema_path : str
+        JSON schema file path to validate against.
+    """
+    f = open(schema_path)
+    schema = json.loads(f.read())
+    validate(instance=output, schema=schema)
+
+
 def parse_suggestions(text_block: str) -> List[Dict[str, str]]:
     """Parse a given text block containing suggestions.
 
@@ -168,5 +183,8 @@ def parse_suggestions(text_block: str) -> List[Dict[str, str]]:
             "text": match.group(4),
         }
         suggestions.append(suggestion)
-
+    validate_output(
+        output=suggestions,
+        schema_path="C:/Users/afernand/Documents/repositories/hackathon-review-bot/schema.json",
+    )
     return suggestions
