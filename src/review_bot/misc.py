@@ -7,7 +7,7 @@ from typing import Dict, List
 
 import openai
 
-from .schema.schema import validate_output
+from review_bot.schema import validate_output
 
 LOG = logging.getLogger(__name__)
 LOG.setLevel("DEBUG")

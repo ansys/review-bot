@@ -6,7 +6,7 @@ from typing import List
 from jsonschema import validate
 
 
-def validate_output(output: List, schema_path: str = "resources/schema.json"):
+def validate_output(output: List, schema_path: str = None):
     """Validate the output from the LLM with the given schema.
 
     Parameters
@@ -16,8 +16,9 @@ def validate_output(output: List, schema_path: str = "resources/schema.json"):
     schema_path : str
         JSON schema file path to validate against.
     """
-    schema_rel_path = os.path.join(os.path.dirname(__file__), schema_path)
+    if schema_path is None:
+        schema_path = os.path.join(os.path.dirname(__file__), "resources/schema.json")
 
-    f = open(schema_rel_path)
+    f = open(schema_path)
     schema = json.loads(f.read())
     validate(instance=output, schema=schema)
