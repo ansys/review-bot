@@ -28,7 +28,6 @@ dependencies = [
     "requests",
     "openai",
     "jsonschema",
-    "json"
 ]
 
 [project.optional-dependencies]
