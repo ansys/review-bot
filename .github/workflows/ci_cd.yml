@@ -72,7 +72,7 @@ jobs:
     steps:
       - uses: pyansys/actions/tests-pytest@v4
         with:
-          pytest-extra-args: "--retries 3 --retry-delay 5 --cov=review_bot --cov-report=term --cov-report=html:.cov/html"
+          pytest-extra-args: "--cov=review_bot --cov-report=term --cov-report=html:.cov/html"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPEN_AI_TOKEN: ${{ secrets.OPEN_AI_TOKEN }}
