@@ -18,7 +18,9 @@ def validate_output(output: List, schema_path: str = None):
         which falls back to the implemented schema inside the package.
     """
     if schema_path is None:
-        schema_path = os.path.join(os.path.dirname(__file__), "resources", "schema.json")
+        schema_path = os.path.join(
+            os.path.dirname(__file__), "resources", "schema.json"
+        )
 
     f = open(schema_path)
     schema = json.loads(f.read())
