@@ -13,11 +13,12 @@ def validate_output(output: List, schema_path: str = None):
     ----------
     output : List
         Formatted output from LLM results.
-    schema_path : str
-        JSON schema file path to validate against.
+    schema_path : str, optional.
+        JSON schema file path to validate against. By default, ``None``,
+        which falls back to the implemented schema inside the package.
     """
     if schema_path is None:
-        schema_path = os.path.join(os.path.dirname(__file__), "resources/schema.json")
+        schema_path = os.path.join(os.path.dirname(__file__), "resources", "schema.json")
 
     f = open(schema_path)
     schema = json.loads(f.read())
