@@ -7,6 +7,8 @@ from typing import Dict, List
 
 import openai
 
+from review_bot.schema import validate_output
+
 LOG = logging.getLogger(__name__)
 LOG.setLevel("DEBUG")
 
@@ -168,5 +170,5 @@ def parse_suggestions(text_block: str) -> List[Dict[str, str]]:
             "text": match.group(4),
         }
         suggestions.append(suggestion)
-
+    validate_output(output=suggestions)
     return suggestions

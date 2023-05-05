@@ -27,6 +27,7 @@ dependencies = [
     "importlib-metadata>=4.0,<5; python_version<='3.8'",
     "requests",
     "openai",
+    "jsonschema",
 ]
 
 [project.optional-dependencies]
