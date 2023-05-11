@@ -3,7 +3,6 @@
 import logging
 import os
 import re
-from typing import Dict, List
 
 import openai
 
@@ -134,7 +133,7 @@ def add_line_numbers(patch):
     return "\n".join(output_lines)
 
 
-def parse_suggestions(text_block: str) -> List[Dict[str, str]]:
+def parse_suggestions(text_block):
     """Parse a given text block containing suggestions.
 
     Returns a list of dictionaries with keys: filename, lines, type, and text.
@@ -157,32 +156,22 @@ def parse_suggestions(text_block: str) -> List[Dict[str, str]]:
     >>> parse_suggestions(tblock)
     [{'filename': 'tests/test_geometric_objects.py', 'lines': '259-260', 'type': 'SUGGESTION', 'text': 'Replace `Rectangle` with `Quadrilateral` for clarity and consistency with the name of the class being tested.'}]
     """
-    LOG.debug("Parsing %s", text_block)
     suggestions = []
-    pattern = r"\[(.*?)\], \[(.*?)\], \[(.*?)\]: (.*?)(?=\n\n\[|\n$)"
-    matches = re.finditer(pattern, text_block, re.MULTILINE | re.DOTALL)
-    for match in matches:
-        if match.group(2) != ("GLOBAL"):
-            lines = match.group(2)[1:-1]
-            if lines is not None or "":
-                suggestion = {
-                    "filename": match.group(1),
-                    "lines": lines,
-                    "type": match.group(3),
-                    "text": match.group(4),
-                }
-            else:
-                suggestion = {
-                    "filename": match.group(1),
-                    "type": match.group(3),
-                    "text": match.group(4),
-                }
-        else:
+    splitted_text = re.split("\[|\]", text_block)[1:]
+    clean_splitted = [i for i in splitted_text if i != ", "]
+    pattern = "GLOBAL|COMMENT|SUGGESTION|INFO"
+    for i in range(0, len(clean_splitted), 4):
+        # sometimes type flag can be dirty, but we can clean it up
+        match = re.search(pattern, clean_splitted[i + 2])
+        if match:
             suggestion = {
-                "filename": match.group(1),
-                "type": match.group(2),
-                "text": match.group(3),
+                "filename": clean_splitted[i],
+                "lines": clean_splitted[i + 1],
+                "type": match.group(),
+                "text": clean_splitted[i + 3],
             }
+        else:
+            raise Exception("Output from OpenAI is not well formed.")
         suggestions.append(suggestion)
-    validate_output(output=suggestions)
+        validate_output(suggestions)
     return suggestions
