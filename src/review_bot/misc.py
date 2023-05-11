@@ -161,14 +161,28 @@ def parse_suggestions(text_block: str) -> List[Dict[str, str]]:
     suggestions = []
     pattern = r"\[(.*?)\], \[(.*?)\], \[(.*?)\]: (.*?)(?=\n\n\[|\n$)"
     matches = re.finditer(pattern, text_block, re.MULTILINE | re.DOTALL)
-
     for match in matches:
-        suggestion = {
-            "filename": match.group(1),
-            "lines": match.group(2),
-            "type": match.group(3),
-            "text": match.group(4),
-        }
+        if match.group(2) != ("GLOBAL"):
+            lines = match.group(2)[1:-1]
+            if lines is not None or "":
+                suggestion = {
+                    "filename": match.group(1),
+                    "lines": lines,
+                    "type": match.group(3),
+                    "text": match.group(4),
+                }
+            else:
+                suggestion = {
+                    "filename": match.group(1),
+                    "type": match.group(3),
+                    "text": match.group(4),
+                }
+        else:
+            suggestion = {
+                "filename": match.group(1),
+                "type": match.group(2),
+                "text": match.group(3),
+            }
         suggestions.append(suggestion)
     validate_output(output=suggestions)
     return suggestions
