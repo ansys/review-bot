@@ -4,6 +4,7 @@ from typing import Dict, List
 
 import openai
 
+from review_bot.exceptions import EmptyOpenAIResponseException
 from review_bot.gh_interface import get_changed_files_and_contents
 from review_bot.git_interface import LocalGit
 from review_bot.misc import _set_open_ai_token, add_line_numbers, parse_suggestions
@@ -180,6 +181,8 @@ This is for comments that do not include code that you want to replace. These sh
 
     # Extract suggestions
     text = response["choices"][0].message.content
+    if len(text) == 0:
+        raise EmptyOpenAIResponseException()
     return parse_suggestions(text)
 
 
@@ -234,4 +237,6 @@ This is for comments that do not include code that you want to replace. These sh
 
     # Extract suggestions
     text = response["choices"][0].message.content
+    if len(text) == 0:
+        raise EmptyOpenAIResponseException()
     return parse_suggestions(text)

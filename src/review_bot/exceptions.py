@@ -20,6 +20,21 @@ class ValidationErrorException(Exception):
     ):
         """Exception initialization."""
         self.message = message
-        if llm_output != None:
-            message += "\n LLM raw output: \n\n" + llm_output
+        if llm_output is not None:
+            message = message + "\n LLM raw output: \n\n" + llm_output
+        super().__init__(self.message)
+
+
+class EmptyOpenAIResponseException(Exception):
+    """Exception class for OpenAI empty responses.
+
+    Parameters
+    ----------
+    message : str, optional
+        Message to be raised, by default "The response from OpenAI is empty."
+    """
+
+    def __init__(self, message: str = "The response from OpenAI is empty."):
+        """Exception initialization."""
+        self.message = message
         super().__init__(self.message)

@@ -161,7 +161,7 @@ def clean_string(input_text: str):
     return output
 
 
-def clean_content(raw_content: List):
+def clean_content(raw_content: List, text_block=None):
     """Join the list of the content.
 
     Join the list of the content, that might be split
@@ -178,6 +178,11 @@ def clean_content(raw_content: List):
         Content processed.
     """
     content_string = "".join(raw_content)
+    if len(content_string) == 0:
+        if text_block is not None:
+            ValidationErrorException("Message content is empty", text_block)
+        else:
+            ValidationErrorException("Message content is empty")
     if content_string[0] == ",":
         # remove comma and space
         content_string = content_string[2:]
@@ -213,40 +218,44 @@ def parse_suggestions(text_block: str):
     splitted_text = text_block.split("\n[")
     for suggestion_text in splitted_text:
         suggestion_info = suggestion_text.split("]")
-        if "." in suggestion_info[0]:
-            filename = clean_string(suggestion_info[0])
-            # match if type is in position 1
-            match_type1 = re.search(pattern, suggestion_info[1])
-            # match if type is in position 2
-            match_type2 = re.search(pattern, suggestion_info[2])
-            if match_type1:
-                lines = ""
-                suggestion_type = clean_string(suggestion_info[1])
-                content = clean_content(suggestion_info[2:])
-            elif match_type2:
-                lines = clean_string(suggestion_info[1])
-                suggestion_type = clean_string(suggestion_info[2])
-                content = clean_content(suggestion_info[3:])
+        if len(suggestion_info) > 3:
+            if "." in suggestion_info[0]:
+                filename = clean_string(suggestion_info[0])
+                # match if type is in position 1
+                match_type1 = re.search(pattern, suggestion_info[1])
+                # match if type is in position 2
+                match_type2 = re.search(pattern, suggestion_info[2])
+                if match_type1:
+                    lines = ""
+                    suggestion_type = clean_string(suggestion_info[1])
+                    content = clean_content(suggestion_info[2:], text_block)
+                elif match_type2:
+                    lines = clean_string(suggestion_info[1])
+                    suggestion_type = clean_string(suggestion_info[2])
+                    content = clean_content(suggestion_info[3:], text_block)
+                else:
+                    LOG.warning("Output is malformed.")
+                    continue
+                suggestion = {
+                    "filename": filename,
+                    "lines": lines,
+                    "type": suggestion_type,
+                    "text": content,
+                }
+                schema_path = os.path.join(
+                    os.path.dirname(__file__), "schema", "resources", "suggestion.json"
+                )
+                if validate_output(suggestion, schema_path):
+                    suggestions.append(suggestion)
             else:
-                # TODO: raise warning with logger
-                print("Output is malformed.")
-                continue
-            suggestion = {
-                "filename": filename,
-                "lines": lines,
-                "type": suggestion_type,
-                "text": content,
-            }
-            schema_path = os.path.join(
-                os.path.dirname(__file__), "schema", "resources", "suggestion.json"
-            )
-            if validate_output(suggestion, schema_path):
-                suggestions.append(suggestion)
+                LOG.warning("Suggestion is not well formed, it will be ignored.")
         else:
-            LOG.warning("Suggestion is not well formed, it will be ignored.")
+            raise ValidationErrorException(
+                "Output format is not well-formed.", llm_output=text_block
+            )
     if not validate_output(suggestions):
         raise ValidationErrorException(
-            "Output format is not well-formed.", llm_output=text_block
+            "Output format is not well formed.", llm_output=text_block
         )
     if len(suggestions) == 0:
         raise ValidationErrorException(
