@@ -5,6 +5,7 @@ import pytest
 from review_bot import review_patch
 
 
+@pytest.mark.flaky(retries=3, delay=5)
 def test_patch_cpp():
     # no matching files
     with pytest.raises(ValueError, match="No files matching"):
@@ -41,6 +42,7 @@ def test_patch_cpp():
         warnings.warn(f"the word '{search_word}' not in suggestions", UserWarning)
 
 
+@pytest.mark.flaky(retries=3, delay=5)
 def test_patch_python():
     sugg = review_patch(
         "ansys",
