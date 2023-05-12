@@ -28,6 +28,7 @@ dependencies = [
     "requests",
     "openai",
     "jsonschema",
+    "gitpython"
 ]
 
 [project.optional-dependencies]
