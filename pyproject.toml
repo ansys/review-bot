@@ -45,6 +45,8 @@ doc = [
     "Sphinx-copybutton==0.5.1",
 ]
 
+[project.scripts]
+reviewbot = "review_bot.cli.cli:main"
 
 [tool.flit.module]
 name = "review_bot"
@@ -70,3 +72,4 @@ source = ["review_bot"]
 
 [tool.coverage.report]
 show_missing = true
+
