@@ -30,9 +30,9 @@ def show_review(args):
 
 
 def main():
-    """Endpoint to execute."""
-    parser = argparse.ArgumentParser(description="An addition program")
-    # add argument
+    """Entrypoint to execute."""
+    parser = argparse.ArgumentParser(description="Reviewbot CLI")
+
     parser.add_argument(
         "-r",
         "--review",
@@ -41,12 +41,10 @@ def main():
         help="Review the diff of the local repo you selected",
     )
 
-    # parse the arguments from standard input
     args = parser.parse_args()
     if args.review != None:
         show_review(args)
 
 
 if __name__ == "__main__":
-    # calling the main function
     main()
