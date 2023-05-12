@@ -3,6 +3,7 @@
 import logging
 import os
 import re
+from typing import List
 
 import openai
 
@@ -133,7 +134,56 @@ def add_line_numbers(patch):
     return "\n".join(output_lines)
 
 
-def parse_suggestions(text_block):
+def clean_string(input_text: str):
+    """Clean `type` and `lines` strings.
+
+    Clean `type` and `lines` strings in the LLM output, in
+    case some unwanted characters are mixed with the desired
+    content.
+
+    Parameters
+    ----------
+    input_text : str
+        Raw text from the LLM
+
+    Returns
+    -------
+    str
+        Cleaned text.
+    """
+    output = input_text.replace("[", "")
+    output = output.replace("]", "")
+    output = output.replace(",", "")
+    output = output.replace(" ", "")
+    output = output.replace("(", "")
+    output = output.replace(")", "")
+    return output
+
+
+def clean_content(raw_content: List):
+    """Join the list of the content.
+
+    Join the list of the content, that might be split
+    due to preprocessing, and cleans starting commas if they appear.
+
+    Parameters
+    ----------
+    raw_content : List
+        List with the content of the suggestion
+
+    Returns
+    -------
+    str
+        Content processed.
+    """
+    content_string = "".join(raw_content)
+    if content_string[0] == ",":
+        # remove comma and space
+        content_string = content_string[2:]
+    return content_string
+
+
+def parse_suggestions(text_block: str):
     """Parse a given text block containing suggestions.
 
     Returns a list of dictionaries with keys: filename, lines, type, and text.
@@ -157,21 +207,45 @@ def parse_suggestions(text_block):
     [{'filename': 'tests/test_geometric_objects.py', 'lines': '259-260', 'type': 'SUGGESTION', 'text': 'Replace `Rectangle` with `Quadrilateral` for clarity and consistency with the name of the class being tested.'}]
     """
     suggestions = []
-    splitted_text = re.split("\[|\]", text_block)[1:]
-    clean_splitted = [i for i in splitted_text if i != ", "]
     pattern = "GLOBAL|COMMENT|SUGGESTION|INFO"
-    for i in range(0, len(clean_splitted), 4):
-        # sometimes type flag can be dirty, but we can clean it up
-        match = re.search(pattern, clean_splitted[i + 2])
-        if match:
+    # splits each individual suggestion:
+    splitted_text = text_block.split("\n[")
+    for suggestion_text in splitted_text:
+        suggestion_info = suggestion_text.split("]")
+        if "." in suggestion_info[0]:
+            filename = clean_string(suggestion_info[0])
+            # match if type is in position 1
+            match_type1 = re.search(pattern, suggestion_info[1])
+            # match if type is in position 2
+            match_type2 = re.search(pattern, suggestion_info[2])
+            if match_type1:
+                lines = ""
+                suggestion_type = clean_string(suggestion_info[1])
+                content = clean_content(suggestion_info[2:])
+            elif match_type2:
+                lines = clean_string(suggestion_info[1])
+                suggestion_type = clean_string(suggestion_info[2])
+                content = clean_content(suggestion_info[3:])
+            else:
+                # TODO: raise warning with logger
+                print("Output is malformed.")
+                continue
             suggestion = {
-                "filename": clean_splitted[i],
-                "lines": clean_splitted[i + 1],
-                "type": match.group(),
-                "text": clean_splitted[i + 3],
+                "filename": filename,
+                "lines": lines,
+                "type": suggestion_type,
+                "text": content,
             }
+            schema_path = os.path.join(
+                os.path.dirname(__file__), "schema", "resources", "suggestion.json"
+            )
+            if validate_output(suggestion, schema_path):
+                suggestions.append(suggestion)
         else:
-            raise Exception("Output from OpenAI is not well formed.")
-        suggestions.append(suggestion)
-        validate_output(suggestions)
+            # TODO: raise warning with logger
+            print("Output is malformed.")
+    if not validate_output(suggestions):
+        raise Exception("JSON Validation failed.")
+    if len(suggestions) == 0:
+        raise Exception("Output is empty.")
     return suggestions
