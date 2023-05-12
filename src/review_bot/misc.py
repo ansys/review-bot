@@ -7,6 +7,7 @@ from typing import List
 
 import openai
 
+from review_bot.exceptions import ValidationErrorException
 from review_bot.schema import validate_output
 
 LOG = logging.getLogger(__name__)
@@ -242,10 +243,14 @@ def parse_suggestions(text_block: str):
             if validate_output(suggestion, schema_path):
                 suggestions.append(suggestion)
         else:
-            # TODO: raise warning with logger
-            print("Output is malformed.")
+            LOG.warning("Suggestion is not well formed, it will be ignored.")
     if not validate_output(suggestions):
-        raise Exception("JSON Validation failed.")
+        raise ValidationErrorException(
+            "Output format is not well-formed.", llm_output=text_block
+        )
     if len(suggestions) == 0:
-        raise Exception("Output is empty.")
+        raise ValidationErrorException(
+            "Output is empty due to all suggestions being malformed.",
+            llm_output=text_block,
+        )
     return suggestions
