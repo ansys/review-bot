@@ -34,12 +34,13 @@ class LocalGit:
         # remove unwanted lines
         diff_lines = diff.split("\n")
         diff_lines_aux = []
-        for i in range(len(diff_lines)):
+        i = 0
+        while i < len(diff_lines):
             if diff_lines[i].startswith("diff"):
-                diff_lines_aux.extend(diff_lines[i:i + 3])
-
-        for line in diff_lines_aux:
-            diff_lines.remove(line)
+                i += 3
+            else:
+                diff_lines_aux.append(diff_lines[i])
+                i += 1
 
         # rejoin the diff into one single string
         diff_processed = "\n".join(diff_lines)
