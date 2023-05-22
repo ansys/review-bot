@@ -169,7 +169,7 @@ def clean_content(raw_content: List, text_block=None):
 
     Parameters
     ----------
-    raw_content : List
+    raw_content : list
         List with the content of the suggestion.
 
     Returns

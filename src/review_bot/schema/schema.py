@@ -11,7 +11,7 @@ def validate_output(output: List, schema_path: str = None):
 
     Parameters
     ----------
-    output : List
+    output : list
         Formatted output from LLM results.
     schema_path : str, optional.
         JSON schema file path to validate against. By default, ``None``,

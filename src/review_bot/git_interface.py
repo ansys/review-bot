@@ -54,7 +54,7 @@ class LocalGit:
 
         Returns
         -------
-        List
+        list
             List with the filenames.
         """
         diff_files = self._preprocess_patch()
