@@ -80,8 +80,8 @@ class LocalGit:
 
         # associate filenames with the code changes
         patch_dict = {}
-        for i in range(len(diff_filenames)):
-            patch_dict[diff_filenames[i]] = diff_files[i]
+        for filename, file in zip(diff_filenames, diff_files):
+            patch_dict[filename] = file
         return patch_dict
 
     def change_branch(self, branch_name: str):
