@@ -21,7 +21,7 @@
           "lines": {
             "type": "string",
             "description": "Which line or lines the comment applies to.",
-            "pattern": "^[0-9]*-[0-9]*$|^[0-9]*$"
+            "pattern": "^[0-9]*-[0-9]*$|^[0-9]*$|^$"
           },
           "type": {
             "type": "string",

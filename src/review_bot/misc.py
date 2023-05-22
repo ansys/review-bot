@@ -3,10 +3,11 @@
 import logging
 import os
 import re
-from typing import Dict, List
+from typing import List
 
 import openai
 
+from review_bot.exceptions import ValidationErrorException
 from review_bot.schema import validate_output
 
 LOG = logging.getLogger(__name__)
@@ -134,7 +135,61 @@ def add_line_numbers(patch):
     return "\n".join(output_lines)
 
 
-def parse_suggestions(text_block: str) -> List[Dict[str, str]]:
+def clean_string(input_text: str):
+    """Clean ``type`` and ``lines`` strings.
+
+    Clean `type` and `lines` strings in the LLM output, in
+    case some unwanted characters are mixed with the desired
+    content.
+
+    Parameters
+    ----------
+    input_text : str
+        Raw text from the LLM.
+
+    Returns
+    -------
+    str
+        Cleaned text.
+    """
+    output = input_text.replace("[", "")
+    output = output.replace("]", "")
+    output = output.replace(",", "")
+    output = output.replace(" ", "")
+    output = output.replace("(", "")
+    output = output.replace(")", "")
+    return output
+
+
+def clean_content(raw_content: List, text_block=None):
+    """Join the list of the content.
+
+    Join the list of the content, that might be split
+    due to preprocessing, and cleans starting commas if they appear.
+
+    Parameters
+    ----------
+    raw_content : list
+        List with the content of the suggestion.
+
+    Returns
+    -------
+    str
+        Content processed.
+    """
+    content_string = "".join(raw_content)
+    if len(content_string) == 0:
+        if text_block is not None:
+            ValidationErrorException("Message content is empty", text_block)
+        else:
+            ValidationErrorException("Message content is empty")
+    if content_string[0] == ",":
+        # remove comma and space
+        content_string = content_string[2:]
+    return content_string
+
+
+def parse_suggestions(text_block: str):
     """Parse a given text block containing suggestions.
 
     Returns a list of dictionaries with keys: filename, lines, type, and text.
@@ -157,18 +212,56 @@ def parse_suggestions(text_block: str) -> List[Dict[str, str]]:
     >>> parse_suggestions(tblock)
     [{'filename': 'tests/test_geometric_objects.py', 'lines': '259-260', 'type': 'SUGGESTION', 'text': 'Replace `Rectangle` with `Quadrilateral` for clarity and consistency with the name of the class being tested.'}]
     """
-    LOG.debug("Parsing %s", text_block)
     suggestions = []
-    pattern = r"\[(.*?)\], \[(.*?)\], \[(.*?)\]: (.*?)(?=\n\n\[|\n$)"
-    matches = re.finditer(pattern, text_block, re.MULTILINE | re.DOTALL)
-
-    for match in matches:
-        suggestion = {
-            "filename": match.group(1),
-            "lines": match.group(2),
-            "type": match.group(3),
-            "text": match.group(4),
-        }
-        suggestions.append(suggestion)
-    validate_output(output=suggestions)
+    pattern = "GLOBAL|COMMENT|SUGGESTION|INFO"
+    # splits each individual suggestion:
+    splitted_text = text_block.split("\n[")
+    for suggestion_text in splitted_text:
+        suggestion_info = suggestion_text.split("]")
+        if len(suggestion_info) > 3:
+            if "." in suggestion_info[0]:
+                filename = clean_string(suggestion_info[0])
+                # match if type is in position 1
+                match_type1 = re.search(pattern, suggestion_info[1])
+                # match if type is in position 2
+                match_type2 = re.search(pattern, suggestion_info[2])
+                if match_type1:
+                    lines = ""
+                    suggestion_type = clean_string(suggestion_info[1])
+                    content = clean_content(suggestion_info[2:], text_block)
+                elif match_type2:
+                    lines = clean_string(suggestion_info[1])
+                    suggestion_type = clean_string(suggestion_info[2])
+                    content = clean_content(suggestion_info[3:], text_block)
+                else:
+                    LOG.warning("Output is malformed.")
+                    continue
+                suggestion = {
+                    "filename": filename,
+                    "lines": lines,
+                    "type": suggestion_type,
+                    "text": content,
+                }
+                schema_path = os.path.join(
+                    os.path.dirname(__file__), "schema", "resources", "suggestion.json"
+                )
+                if validate_output(suggestion, schema_path):
+                    suggestions.append(suggestion)
+            else:
+                LOG.warning(
+                    "Suggestion does not contain a path to a file in the proper position, it will be ignored."
+                )
+        else:
+            LOG.warning(
+                "Suggestion is missing some section, this suggestion will be ignored."
+            )
+    if not validate_output(suggestions):
+        raise ValidationErrorException(
+            "Output format is not well formed.", llm_output=text_block
+        )
+    if len(suggestions) == 0:
+        raise ValidationErrorException(
+            "Output is empty due to all suggestions being malformed.",
+            llm_output=text_block,
+        )
     return suggestions

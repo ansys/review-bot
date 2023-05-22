@@ -1,0 +1,31 @@
+{
+  "title": "Individual suggestion GPT output format",
+  "type": "object",
+  "required": [
+    "filename",
+    "lines",
+    "type",
+    "text"
+  ],
+  "properties": {
+    "filename": {
+      "type": "string",
+      "description": "Path or URL to the file."
+    },
+    "lines": {
+      "type": "string",
+      "description": "Which line or lines the comment applies to.",
+      "pattern": "^[0-9]*-[0-9]*$|^[0-9]*$|^$"
+    },
+    "type": {
+      "type": "string",
+      "description": "Type of the comment.",
+      "pattern": "SUGGESTION|GLOBAL|INFO|COMMENT"
+    },
+    "text": {
+      "type": "string",
+      "description": "Content of the comment"
+    }
+  }
+}
+
