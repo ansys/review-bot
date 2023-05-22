@@ -248,10 +248,12 @@ def parse_suggestions(text_block: str):
                 if validate_output(suggestion, schema_path):
                     suggestions.append(suggestion)
             else:
-                LOG.warning("Suggestion is not well formed, it will be ignored.")
+                LOG.warning(
+                    "Suggestion does not contain a path to a file in the proper position, it will be ignored."
+                )
         else:
-            raise ValidationErrorException(
-                "Output format is not well-formed.", llm_output=text_block
+            LOG.warning(
+                "Suggestion is missing some section, this suggestion will be ignored."
             )
     if not validate_output(suggestions):
         raise ValidationErrorException(
