@@ -7,10 +7,10 @@ class ValidationErrorException(Exception):
     Parameters
     ----------
     message : str, optional
-        Message to be raised, by default "Output message from LLM is not properly formed."
+        Message to be raised, by default "Output message from LLM is not properly formed.".
 
     llm_output : str, optional
-        Raw output from the LLM, by default None
+        Raw output from the LLM, by default ``None``.
     """
 
     def __init__(
@@ -31,7 +31,7 @@ class EmptyOpenAIResponseException(Exception):
     Parameters
     ----------
     message : str, optional
-        Message to be raised, by default "The response from OpenAI is empty."
+        Message to be raised, by default "The response from OpenAI is empty.".
     """
 
     def __init__(self, message: str = "The response from OpenAI is empty."):

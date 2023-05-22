@@ -136,7 +136,7 @@ def add_line_numbers(patch):
 
 
 def clean_string(input_text: str):
-    """Clean `type` and `lines` strings.
+    """Clean ``type`` and ``lines`` strings.
 
     Clean `type` and `lines` strings in the LLM output, in
     case some unwanted characters are mixed with the desired
@@ -145,7 +145,7 @@ def clean_string(input_text: str):
     Parameters
     ----------
     input_text : str
-        Raw text from the LLM
+        Raw text from the LLM.
 
     Returns
     -------
@@ -170,7 +170,7 @@ def clean_content(raw_content: List, text_block=None):
     Parameters
     ----------
     raw_content : List
-        List with the content of the suggestion
+        List with the content of the suggestion.
 
     Returns
     -------

@@ -11,7 +11,7 @@ class LocalGit:
     Parameters
     ----------
     repo_path : str
-    Path to the local repository
+        Path to the local repository.
     """
 
     def __init__(self, repo_path: str):
@@ -25,7 +25,7 @@ class LocalGit:
         Returns
         -------
         list
-            Diff without unneeded lines and separated by file.
+            Diff without unnecessary lines and separated by file.
         """
         # get the repo and get the diff of the last commit with main
         tree = self._repo.heads.main.commit.tree
@@ -36,8 +36,7 @@ class LocalGit:
         diff_lines_aux = []
         for i in range(len(diff_lines)):
             if diff_lines[i].startswith("diff"):
-                for j in range(3):
-                    diff_lines_aux.append(diff_lines[i + j])
+                diff_lines_aux.extend(diff_lines[i:i + 3])
 
         for line in diff_lines_aux:
             diff_lines.remove(line)
