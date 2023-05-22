@@ -37,7 +37,7 @@ tests = [
     "pytest-cov==4.0.0",
     "pytest-retry==1.2.1",
     "requests==2.30.0",
-    "openai==0.27.6",
+    "openai==0.27.7",
 ]
 doc = [
     "ansys_sphinx_theme==0.9.9",
