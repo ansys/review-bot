@@ -23,7 +23,7 @@ class StopOnTokens(StoppingCriteria):
     tokenizer : AutoTokenizer
         Tokenizer that will be used with the model.
     stopwords : list, optional
-        Words that will mark the end of the inference, by default ["<|im_end|>", "<|endoftext|>"].
+        Words that will mark the end of the inference.
     """
 
     def __init__(self, tokenizer, stopwords=["<|im_end|>", "<|endoftext|>"]):
