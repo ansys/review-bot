@@ -33,7 +33,7 @@ def _set_open_ai_config():
     openai.api_key = access_token
     openai.api_type = "azure"
     openai.api_base = api_base
-    openai.api_version = "2023-05-15"
+    openai.api_version = "2023-03-15-preview"
 
 
 def open_logger(

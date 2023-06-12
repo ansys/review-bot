@@ -14,7 +14,7 @@ LOG.setLevel("DEBUG")
 
 # Developer note:
 # There is a significant improvement in the completion using gpt-4 vs gpt-3.5-turbo
-OPEN_AI_MODEL = "gpt-4"
+OPEN_AI_MODEL = "GPT-35"
 
 
 def review_patch(
@@ -178,7 +178,6 @@ This is for comments that do not include code that you want to replace. These sh
             },
         ],
     )
-
     # Extract suggestions
     text = response["choices"][0].message.content
     if len(text) == 0:
