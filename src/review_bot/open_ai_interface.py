@@ -153,7 +153,7 @@ def generate_suggestions_with_source(filename, file_src, patch) -> List[Dict[str
     LOG.debug("PATCH: %s", patch)
 
     response = openai.ChatCompletion.create(
-        model=OPEN_AI_MODEL,
+        engine=OPEN_AI_MODEL,
         messages=[
             {
                 "role": "system",
