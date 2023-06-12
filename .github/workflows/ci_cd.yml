@@ -77,7 +77,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPEN_AI_TOKEN: ${{ secrets.OPEN_AI_TOKEN }}
           OPEN_AI_TYPE: "azure"
-          OPENAI_API_BASE: "https://csebu-chatgpt.openai.azure.com/"
+          OPENAI_API_BASE: "https://csebu-chatgpt-francecentral.openai.azure.com/"
   doc-build:
     name: Build documentation
     runs-on: ubuntu-latest
