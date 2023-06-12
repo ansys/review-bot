@@ -22,12 +22,17 @@ def _get_gh_token():
     return access_token
 
 
-def _set_open_ai_token():
+def _set_open_ai_config():
     """Return the github access token from the GITHUB_TOKEN environment variable."""
     access_token = os.environ.get("OPEN_AI_TOKEN")
+    api_base = os.environ.get("OPENAI_API_BASE")
+    if api_base is None:
+        raise OSError('Missing "OPENAI_API_BASE" environment variable')
     if access_token is None:
         raise OSError('Missing "OPEN_AI_TOKEN" environment variable')
     openai.api_key = access_token
+    openai.api_type = "azure"
+    openai.api_base = api_base
 
 
 def open_logger(

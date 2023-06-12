@@ -7,7 +7,7 @@ import openai
 from review_bot.exceptions import EmptyOpenAIResponseException
 from review_bot.gh_interface import get_changed_files_and_contents
 from review_bot.git_interface import LocalGit
-from review_bot.misc import _set_open_ai_token, add_line_numbers, parse_suggestions
+from review_bot.misc import _set_open_ai_config, add_line_numbers, parse_suggestions
 
 LOG = logging.getLogger(__name__)
 LOG.setLevel("DEBUG")
@@ -147,7 +147,7 @@ def generate_suggestions_with_source(filename, file_src, patch) -> List[Dict[str
     list[dict]
         A list of dictionaries containing suggestions for the patch.
     """
-    _set_open_ai_token()
+    _set_open_ai_config()
     LOG.debug("Generating suggestions for a given file source and patch.")
     LOG.debug("FILENAME: %s", filename)
     LOG.debug("PATCH: %s", patch)
@@ -202,7 +202,7 @@ def generate_suggestions(filename, patch) -> List[Dict[str, str]]:
     list[dict]
         A list of dictionaries containing suggestions for the patch.
     """
-    _set_open_ai_token()
+    _set_open_ai_config()
     LOG.debug("Generating suggestions for a given file source and patch.")
     LOG.debug("FILENAME: %s", filename)
     LOG.debug("PATCH: %s", patch)
