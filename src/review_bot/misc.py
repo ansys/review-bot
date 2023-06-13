@@ -31,7 +31,7 @@ def _set_open_ai_config():
     openai.api_key = access_token
 
     json_file_path = os.path.join(
-        str(Path(__file__).parent.parent.parent), "config/openai-config.json"
+        str(Path(__file__).parent.parent), "config/openai-config.json"
     )
     LOG.debug(json_file_path)
 
