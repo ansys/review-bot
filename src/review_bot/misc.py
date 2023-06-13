@@ -2,7 +2,6 @@
 import json
 import logging
 import os
-from pathlib import Path
 import re
 from typing import List
 
@@ -31,7 +30,7 @@ def _set_open_ai_config():
     openai.api_key = access_token
 
     json_file_path = os.path.join(
-        str(Path(__file__).parent.parent), "config/openai-config.json"
+        os.path.dirname(__file__), "config", "openai-config.json"
     )
     LOG.debug(json_file_path)
 
