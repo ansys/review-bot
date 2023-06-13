@@ -1,0 +1,6 @@
+{
+    "MODEL": "gpt-4",
+    "API_BASE": "https://csebu-chatgpt-francecentral.openai.azure.com/",
+    "API_VERSION": "2023-03-15-preview",
+    "API_TYPE": "azure"
+}

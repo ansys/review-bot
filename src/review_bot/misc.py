@@ -1,7 +1,8 @@
 """Miscellaneous functions."""
-
+import json
 import logging
 import os
+from pathlib import Path
 import re
 from typing import List
 
@@ -25,15 +26,23 @@ def _get_gh_token():
 def _set_open_ai_config():
     """Return the github access token from the GITHUB_TOKEN environment variable."""
     access_token = os.environ.get("OPEN_AI_TOKEN")
-    api_base = os.environ.get("OPENAI_API_BASE")
-    if api_base is None:
-        raise OSError('Missing "OPENAI_API_BASE" environment variable')
     if access_token is None:
         raise OSError('Missing "OPEN_AI_TOKEN" environment variable')
     openai.api_key = access_token
-    openai.api_type = "azure"
-    openai.api_base = api_base
-    openai.api_version = "2023-03-15-preview"
+
+    json_file_path = os.path.join(
+        str(Path(__file__).parent.parent.parent), "config/openai-config.json"
+    )
+    LOG.debug(json_file_path)
+
+    with open(json_file_path) as json_file:
+        config = json.load(json_file)
+    if "API_TYPE" in config:
+        openai.api_type = config["API_TYPE"]
+    if "API_BASE" in config:
+        openai.api_base = config["API_BASE"]
+    if "API_VERSION" in config:
+        openai.api_version = config["API_VERSION"]
 
 
 def open_logger(
