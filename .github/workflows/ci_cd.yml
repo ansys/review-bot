@@ -76,8 +76,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPEN_AI_TOKEN: ${{ secrets.OPEN_AI_TOKEN }}
-          OPEN_AI_TYPE: "azure"
-          OPENAI_API_BASE: "https://csebu-chatgpt-francecentral.openai.azure.com/"
+          OPENAI_API_TYPE: "azure"
+          OPENAI_API_BASE: ${{ secrets.OPENAI_API_BASE }}
+          OPENAI_API_VERSION: "2023-03-15-preview"
   doc-build:
     name: Build documentation
     runs-on: ubuntu-latest

@@ -18,7 +18,13 @@ OPEN_AI_MODEL = "gpt-4"
 
 
 def review_patch(
-    owner, repo, pr, use_src=False, filter_filename=None, gh_access_token=None
+    owner,
+    repo,
+    pr,
+    use_src=False,
+    filter_filename=None,
+    gh_access_token=None,
+    config_file: str = None,
 ):
     """Review a patch in a pull request and generate suggestions for improvement.
 
@@ -38,7 +44,8 @@ def review_patch(
     gh_access_token : str, optional
         GitHub token needed to communicate with the repository. By default, ``None``,
         which means it will try to read an existing env variable named ``GITHUB_TOKEN``.
-
+    config_file : str, optional
+        Path to OpenAI configuration file. By default, ``None``.
     Returns
     -------
     list[dict]
@@ -63,7 +70,7 @@ def review_patch(
         if use_src:
             file_src = f"FILENAME: {filename}\nCONTENT:\n{file_data['file_text']}"
             suggestions.extend(
-                generate_suggestions_with_source(filename, file_src, patch)
+                generate_suggestions_with_source(filename, file_src, patch, config_file)
             )
         else:
             suggestions.extend(generate_suggestions(filename, patch))
@@ -76,7 +83,11 @@ def review_patch(
 
 
 def review_patch_local(
-    repo: str, branch: str = None, use_src=False, filter_filename=None
+    repo: str,
+    branch: str = None,
+    use_src=False,
+    filter_filename=None,
+    config_file: str = None,
 ):
     """Review a patch in a pull request and generate suggestions for improvement.
 
@@ -91,6 +102,8 @@ def review_patch_local(
         not for large ones.
     filter_filename : str, optional
         If set, filters out all but the file matching this string.
+    config_file : str, optional
+        Path to OpenAI configuration file. By default, ``None``.
 
     Returns
     -------
@@ -118,7 +131,7 @@ def review_patch_local(
         if use_src:
             file_src = f"FILENAME: {filename}\nCONTENT:\n{file_sources['file_text']}"
             suggestions.extend(
-                generate_suggestions_with_source(filename, file_src, patch)
+                generate_suggestions_with_source(filename, file_src, patch, config_file)
             )
         else:
             suggestions.extend(generate_suggestions(filename, patch))
@@ -130,7 +143,9 @@ def review_patch_local(
     return suggestions
 
 
-def generate_suggestions_with_source(filename, file_src, patch) -> List[Dict[str, str]]:
+def generate_suggestions_with_source(
+    filename, file_src, patch, config_file: str = None
+) -> List[Dict[str, str]]:
     """Generate suggestions for a given file source and patch.
 
     Parameters
@@ -141,13 +156,15 @@ def generate_suggestions_with_source(filename, file_src, patch) -> List[Dict[str
         The source file text including the file name and its contents.
     patch : str
         The patch text containing line numbers and changes.
+    config_file : str, optional
+        Path to OpenAI configuration file. By default, ``None``.
 
     Returns
     -------
     list[dict]
         A list of dictionaries containing suggestions for the patch.
     """
-    _set_open_ai_config()
+    _set_open_ai_config(config_file)
     LOG.debug("Generating suggestions for a given file source and patch.")
     LOG.debug("FILENAME: %s", filename)
     LOG.debug("PATCH: %s", patch)
@@ -186,7 +203,9 @@ This is for comments that do not include code that you want to replace. These sh
     return parse_suggestions(text)
 
 
-def generate_suggestions(filename, patch) -> List[Dict[str, str]]:
+def generate_suggestions(
+    filename, patch, config_file: str = None
+) -> List[Dict[str, str]]:
     """
     Generate suggestions for a given file source and patch.
 
@@ -196,13 +215,15 @@ def generate_suggestions(filename, patch) -> List[Dict[str, str]]:
         Name of the file being patched.
     patch : str
         The patch text containing line numbers and changes.
+    config_file : str, optional
+        Path to OpenAI configuration file. By default, ``None``.
 
     Returns
     -------
     list[dict]
         A list of dictionaries containing suggestions for the patch.
     """
-    _set_open_ai_config()
+    _set_open_ai_config(config_file)
     LOG.debug("Generating suggestions for a given file source and patch.")
     LOG.debug("FILENAME: %s", filename)
     LOG.debug("PATCH: %s", patch)

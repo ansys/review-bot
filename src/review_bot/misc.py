@@ -7,6 +7,7 @@ from typing import List
 
 import openai
 
+from review_bot.defaults import ACCESS_TOKEN, API_BASE, API_TYPE, API_VERSION
 from review_bot.exceptions import ValidationErrorException
 from review_bot.schema import validate_output
 
@@ -22,26 +23,43 @@ def _get_gh_token():
     return access_token
 
 
-def _set_open_ai_config():
+def _set_open_ai_config(config_file: str = None):
     """Return the github access token from the GITHUB_TOKEN environment variable."""
-    access_token = os.environ.get("OPEN_AI_TOKEN")
+    if config_file is not None:
+        with open(config_file) as json_file:
+            config = json.load(json_file)
+
+    access_token = ACCESS_TOKEN
+    api_base = API_BASE
+    api_type = API_TYPE
+    api_version = API_VERSION
+
     if access_token is None:
         raise OSError('Missing "OPEN_AI_TOKEN" environment variable')
+    if api_type is None:
+        if config_file is not None:
+            if "API_TYPE" in config:
+                api_type = config["API_TYPE"]
+
+    if api_version is None:
+        if config_file is not None:
+            if "API_VERSION" in config:
+                api_version = config["API_VERSION"]
+
+    if api_base is None:
+        if config_file is not None:
+            if "API_VERSION" in config:
+                api_base = config["API_BASE"]
+
+    if access_token is None:
+        if config_file is not None:
+            if "API_TOKEN" in config:
+                access_token = config["ACCESS_TOKEN"]
+
     openai.api_key = access_token
-
-    json_file_path = os.path.join(
-        os.path.dirname(__file__), "config", "openai-config.json"
-    )
-    LOG.debug(json_file_path)
-
-    with open(json_file_path) as json_file:
-        config = json.load(json_file)
-    if "API_TYPE" in config:
-        openai.api_type = config["API_TYPE"]
-    if "API_BASE" in config:
-        openai.api_base = config["API_BASE"]
-    if "API_VERSION" in config:
-        openai.api_version = config["API_VERSION"]
+    openai.api_base = api_base
+    openai.api_type = api_type
+    openai.api_version = api_version
 
 
 def open_logger(
