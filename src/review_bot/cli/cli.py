@@ -18,11 +18,15 @@ def show_review(args):
     repo_path = args.review[0]
     if ".git" not in os.listdir(repo_path):
         raise Exception("Not a git repository.")
+    
+    # Check if any config file was given
     if args.config is not None:
         config_file = args.config[0]
         sugg = review_patch_local(repo_path, config_file)
     else:
         sugg = review_patch_local(repo_path)
+        
+    # Submit the suggestions as stdout
     for suggestion in sugg:
         text = f"""
         -> In file {os.path.join(repo_path, suggestion["filename"])}, in lines {suggestion["lines"]}:
@@ -51,6 +55,7 @@ def main():
         nargs=1,
         help="Path to the configuration file for OpenAI",
     )
+    
     args = parser.parse_args()
     if args.review != None:
         show_review(args)
