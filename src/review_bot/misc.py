@@ -29,37 +29,35 @@ def _set_open_ai_config(config_file: str = None):
         with open(config_file) as json_file:
             config = json.load(json_file)
 
-    access_token = ACCESS_TOKEN
-    api_base = API_BASE
-    api_type = API_TYPE
-    api_version = API_VERSION
+    api_type = (
+        config["API_TYPE"]
+        if config_file is not None and "API_TYPE" in config
+        else API_TYPE
+    )
+    api_version = (
+        config["API_VERSION"]
+        if config_file is not None and "API_VERSION" in config
+        else API_VERSION
+    )
+    api_base = (
+        config["API_BASE"]
+        if config_file is not None and "API_BASE" in config
+        else API_BASE
+    )
+    access_token = (
+        config["ACCESS_TOKEN"]
+        if config_file is not None and "ACCESS_TOKEN" in config
+        else ACCESS_TOKEN
+    )
 
     if access_token is None:
         raise OSError('Missing "OPEN_AI_TOKEN" environment variable')
-    if api_type is None:
-        if config_file is not None:
-            if "API_TYPE" in config:
-                api_type = config["API_TYPE"]
-
-    if api_version is None:
-        if config_file is not None:
-            if "API_VERSION" in config:
-                api_version = config["API_VERSION"]
-
-    if api_base is None:
-        if config_file is not None:
-            if "API_VERSION" in config:
-                api_base = config["API_BASE"]
-
-    if access_token is None:
-        if config_file is not None:
-            if "API_TOKEN" in config:
-                access_token = config["ACCESS_TOKEN"]
 
     openai.api_key = access_token
-    openai.api_base = api_base
-    openai.api_type = api_type
-    openai.api_version = api_version
+    if api_type == "azure":
+        openai.api_base = api_base
+        openai.api_type = api_type
+        openai.api_version = api_version
 
 
 def open_logger(
