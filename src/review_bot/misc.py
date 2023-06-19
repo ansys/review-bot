@@ -1,5 +1,5 @@
 """Miscellaneous functions."""
-
+import json
 import logging
 import os
 import re
@@ -7,6 +7,7 @@ from typing import List
 
 import openai
 
+from review_bot.defaults import ACCESS_TOKEN, API_BASE, API_TYPE, API_VERSION
 from review_bot.exceptions import ValidationErrorException
 from review_bot.schema import validate_output
 
@@ -22,12 +23,41 @@ def _get_gh_token():
     return access_token
 
 
-def _set_open_ai_token():
+def _set_open_ai_config(config_file: str = None):
     """Return the github access token from the GITHUB_TOKEN environment variable."""
-    access_token = os.environ.get("OPEN_AI_TOKEN")
+    if config_file is not None:
+        with open(config_file) as json_file:
+            config = json.load(json_file)
+
+    api_type = (
+        config["OPENAI_API_TYPE"]
+        if config_file is not None and "OPENAI_API_TYPE" in config
+        else API_TYPE
+    )
+    api_version = (
+        config["OPENAI_API_VERSION"]
+        if config_file is not None and "OPENAI_API_VERSION" in config
+        else API_VERSION
+    )
+    api_base = (
+        config["OPENAI_API_BASE"]
+        if config_file is not None and "OPENAI_API_BASE" in config
+        else API_BASE
+    )
+    access_token = (
+        config["OPEN_AI_TOKEN"]
+        if config_file is not None and "OPEN_AI_TOKEN" in config
+        else ACCESS_TOKEN
+    )
+
     if access_token is None:
         raise OSError('Missing "OPEN_AI_TOKEN" environment variable')
+
     openai.api_key = access_token
+    if api_type == "azure":
+        openai.api_base = api_base
+        openai.api_type = api_type
+        openai.api_version = api_version
 
 
 def open_logger(
