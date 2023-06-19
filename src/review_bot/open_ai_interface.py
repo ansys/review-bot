@@ -4,21 +4,28 @@ from typing import Dict, List
 
 import openai
 
+import review_bot.defaults as defaults
 from review_bot.exceptions import EmptyOpenAIResponseException
 from review_bot.gh_interface import get_changed_files_and_contents
 from review_bot.git_interface import LocalGit
-from review_bot.misc import _set_open_ai_token, add_line_numbers, parse_suggestions
+from review_bot.misc import _set_open_ai_config, add_line_numbers, parse_suggestions
 
 LOG = logging.getLogger(__name__)
 LOG.setLevel("DEBUG")
 
 # Developer note:
 # There is a significant improvement in the completion using gpt-4 vs gpt-3.5-turbo
-OPEN_AI_MODEL = "gpt-4"
+OPEN_AI_MODEL = defaults.API_MODEL
 
 
 def review_patch(
-    owner, repo, pr, use_src=False, filter_filename=None, gh_access_token=None
+    owner,
+    repo,
+    pr,
+    use_src=False,
+    filter_filename=None,
+    gh_access_token=None,
+    config_file: str = None,
 ):
     """Review a patch in a pull request and generate suggestions for improvement.
 
@@ -38,7 +45,8 @@ def review_patch(
     gh_access_token : str, optional
         GitHub token needed to communicate with the repository. By default, ``None``,
         which means it will try to read an existing env variable named ``GITHUB_TOKEN``.
-
+    config_file : str, optional
+        Path to OpenAI configuration file. By default, ``None``.
     Returns
     -------
     list[dict]
@@ -63,7 +71,7 @@ def review_patch(
         if use_src:
             file_src = f"FILENAME: {filename}\nCONTENT:\n{file_data['file_text']}"
             suggestions.extend(
-                generate_suggestions_with_source(filename, file_src, patch)
+                generate_suggestions_with_source(filename, file_src, patch, config_file)
             )
         else:
             suggestions.extend(generate_suggestions(filename, patch))
@@ -76,7 +84,11 @@ def review_patch(
 
 
 def review_patch_local(
-    repo: str, branch: str = None, use_src=False, filter_filename=None
+    repo: str,
+    branch: str = None,
+    use_src=False,
+    filter_filename=None,
+    config_file: str = None,
 ):
     """Review a patch in a pull request and generate suggestions for improvement.
 
@@ -91,6 +103,8 @@ def review_patch_local(
         not for large ones.
     filter_filename : str, optional
         If set, filters out all but the file matching this string.
+    config_file : str, optional
+        Path to OpenAI configuration file. By default, ``None``.
 
     Returns
     -------
@@ -118,7 +132,7 @@ def review_patch_local(
         if use_src:
             file_src = f"FILENAME: {filename}\nCONTENT:\n{file_sources['file_text']}"
             suggestions.extend(
-                generate_suggestions_with_source(filename, file_src, patch)
+                generate_suggestions_with_source(filename, file_src, patch, config_file)
             )
         else:
             suggestions.extend(generate_suggestions(filename, patch))
@@ -130,7 +144,9 @@ def review_patch_local(
     return suggestions
 
 
-def generate_suggestions_with_source(filename, file_src, patch) -> List[Dict[str, str]]:
+def generate_suggestions_with_source(
+    filename, file_src, patch, config_file: str = None
+) -> List[Dict[str, str]]:
     """Generate suggestions for a given file source and patch.
 
     Parameters
@@ -141,19 +157,21 @@ def generate_suggestions_with_source(filename, file_src, patch) -> List[Dict[str
         The source file text including the file name and its contents.
     patch : str
         The patch text containing line numbers and changes.
+    config_file : str, optional
+        Path to OpenAI configuration file. By default, ``None``.
 
     Returns
     -------
     list[dict]
         A list of dictionaries containing suggestions for the patch.
     """
-    _set_open_ai_token()
+    _set_open_ai_config(config_file)
     LOG.debug("Generating suggestions for a given file source and patch.")
     LOG.debug("FILENAME: %s", filename)
     LOG.debug("PATCH: %s", patch)
 
     response = openai.ChatCompletion.create(
-        model=OPEN_AI_MODEL,
+        engine=OPEN_AI_MODEL,
         messages=[
             {
                 "role": "system",
@@ -178,15 +196,17 @@ This is for comments that do not include code that you want to replace. These sh
             },
         ],
     )
-
     # Extract suggestions
+    LOG.debug(response)
     text = response["choices"][0].message.content
     if len(text) == 0:
         raise EmptyOpenAIResponseException()
     return parse_suggestions(text)
 
 
-def generate_suggestions(filename, patch) -> List[Dict[str, str]]:
+def generate_suggestions(
+    filename, patch, config_file: str = None
+) -> List[Dict[str, str]]:
     """
     Generate suggestions for a given file source and patch.
 
@@ -196,19 +216,21 @@ def generate_suggestions(filename, patch) -> List[Dict[str, str]]:
         Name of the file being patched.
     patch : str
         The patch text containing line numbers and changes.
+    config_file : str, optional
+        Path to OpenAI configuration file. By default, ``None``.
 
     Returns
     -------
     list[dict]
         A list of dictionaries containing suggestions for the patch.
     """
-    _set_open_ai_token()
+    _set_open_ai_config(config_file)
     LOG.debug("Generating suggestions for a given file source and patch.")
     LOG.debug("FILENAME: %s", filename)
     LOG.debug("PATCH: %s", patch)
 
     response = openai.ChatCompletion.create(
-        model=OPEN_AI_MODEL,
+        engine=OPEN_AI_MODEL,
         messages=[
             {
                 "role": "system",
@@ -234,7 +256,7 @@ This is for comments that do not include code that you want to replace. These sh
         ],
         # n=3,
     )
-
+    LOG.debug(response)
     # Extract suggestions
     text = response["choices"][0].message.content
     if len(text) == 0:

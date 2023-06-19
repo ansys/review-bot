@@ -11,7 +11,7 @@ LaTeXBuilder.supported_image_types = ["image/png", "image/pdf", "image/svg+xml"]
 
 
 # Project information
-project = "Ansys Hackathon - Review bot"
+project = "GitHub Reviewer bot"
 copyright = f"(c) {datetime.now().year} ANSYS, Inc. All rights reserved"
 author = "ANSYS, Inc."
 release = version = __version__
