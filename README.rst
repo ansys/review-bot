@@ -74,7 +74,8 @@ To use the CLI of the tool:
 
 An example of the OpenAI config file
 
-.. code:: bash
+.. code-block:: json
+
    {
       "MODEL": "gpt-4",
       "API_BASE": "https://your-api-base.openai.azure.com/",
