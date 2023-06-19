@@ -22,6 +22,13 @@ Get the type of OpenAI API we are using from the
 environment variables.
 """
 
+API_MODEL = os.environ.get("OPENAI_MODEL", None)
+"""Default OpenAI Model to use.
+
+Get the type of OpenAI model we are using from the
+environment variables. In Azure dependes on the
+service you have available.
+"""
 
 API_VERSION = os.environ.get("OPENAI_API_VERSION", "2023-05-15")
 """Default OpenAI API Azure version we are using.

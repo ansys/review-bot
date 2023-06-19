@@ -4,6 +4,7 @@ from typing import Dict, List
 
 import openai
 
+import review_bot.defaults as defaults
 from review_bot.exceptions import EmptyOpenAIResponseException
 from review_bot.gh_interface import get_changed_files_and_contents
 from review_bot.git_interface import LocalGit
@@ -14,7 +15,7 @@ LOG.setLevel("DEBUG")
 
 # Developer note:
 # There is a significant improvement in the completion using gpt-4 vs gpt-3.5-turbo
-OPEN_AI_MODEL = "gpt-4"
+OPEN_AI_MODEL = defaults.API_MODEL
 
 
 def review_patch(

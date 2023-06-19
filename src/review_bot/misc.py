@@ -30,23 +30,23 @@ def _set_open_ai_config(config_file: str = None):
             config = json.load(json_file)
 
     api_type = (
-        config["API_TYPE"]
-        if config_file is not None and "API_TYPE" in config
+        config["OPENAI_API_TYPE"]
+        if config_file is not None and "OPENAI_API_TYPE" in config
         else API_TYPE
     )
     api_version = (
-        config["API_VERSION"]
-        if config_file is not None and "API_VERSION" in config
+        config["OPENAI_API_VERSION"]
+        if config_file is not None and "OPENAI_API_VERSION" in config
         else API_VERSION
     )
     api_base = (
-        config["API_BASE"]
-        if config_file is not None and "API_BASE" in config
+        config["OPENAI_API_BASE"]
+        if config_file is not None and "OPENAI_API_BASE" in config
         else API_BASE
     )
     access_token = (
-        config["ACCESS_TOKEN"]
-        if config_file is not None and "ACCESS_TOKEN" in config
+        config["OPEN_AI_TOKEN"]
+        if config_file is not None and "OPEN_AI_TOKEN" in config
         else ACCESS_TOKEN
     )
 

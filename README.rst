@@ -77,10 +77,11 @@ An example of the OpenAI config file
 .. code-block:: json
 
    {
-      "MODEL": "gpt-4",
-      "API_BASE": "https://your-api-base.openai.azure.com/",
-      "API_VERSION": "2023-03-15-preview",
-      "API_TYPE": "azure"
+      "OPEN_AI_TOKEN": "your-token",
+      "OPENAI_MODEL": "gpt-4",
+      "OPENAI_API_BASE": "https://your-api-base.openai.azure.com/",
+      "OPENAI_API_VERSION": "2023-03-15-preview",
+      "OPENAI_API_TYPE": "azure"
    }
 
 
