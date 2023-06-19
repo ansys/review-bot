@@ -63,6 +63,25 @@ Then, you can simply execute:
     python -m pip install review-bot
 
 
+Usage
+-----
+
+To use the CLI of the tool:
+
+.. code:: bash
+
+    reviewbot <-r path-to-repo> [-c path-to-openai-config] 
+
+An example of the OpenAI config file::
+   {
+      "MODEL": "gpt-4",
+      "API_BASE": "https://your-api-base.openai.azure.com/",
+      "API_VERSION": "2023-03-15-preview",
+      "API_TYPE": "azure"
+   }
+
+
+
 A note on pre-commit
 ^^^^^^^^^^^^^^^^^^^^
 
