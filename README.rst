@@ -72,7 +72,9 @@ To use the CLI of the tool:
 
     reviewbot <-r path-to-repo> [-c path-to-openai-config] 
 
-An example of the OpenAI config file::
+An example of the OpenAI config file
+
+.. code:: bash
    {
       "MODEL": "gpt-4",
       "API_BASE": "https://your-api-base.openai.azure.com/",
