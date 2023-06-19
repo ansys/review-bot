@@ -1,5 +1,5 @@
-Ansys Hackathon - Review bot
-============================
+GitHub Reviewer bot
+===================
 
 |pyansys| |GH-CI| |codecov| |MIT| |black|
 
@@ -7,12 +7,12 @@ Ansys Hackathon - Review bot
    :target: https://docs.pyansys.com/
    :alt: PyAnsys
 
-.. |codecov| image:: https://codecov.io/gh/ansys/hackathon-review-bot/branch/main/graph/badge.svg
-   :target: https://codecov.io/gh/ansys/hackathon-review-bot
+.. |codecov| image:: https://codecov.io/gh/ansys/review-bot/branch/main/graph/badge.svg
+   :target: https://codecov.io/gh/ansys/review-bot
    :alt: Codecov
 
-.. |GH-CI| image:: https://github.com/ansys/hackathon-review-bot/actions/workflows/ci_cd.yml/badge.svg
-   :target: https://github.com/ansys/hackathon-review-bot/actions/workflows/ci_cd.yml
+.. |GH-CI| image:: https://github.com/ansys-internal/review-bot/actions/workflows/ci_cd.yml/badge.svg
+   :target: https://github.com/ansys-internal/review-bot/actions/workflows/ci_cd.yml
    :alt: GH-CI
 
 .. |MIT| image:: https://img.shields.io/badge/License-MIT-yellow.svg
@@ -49,7 +49,7 @@ At two installation modes are provided: user and developer.
 For users
 ^^^^^^^^^
 
-In order to install Pyproduct library, make sure you
+In order to install ``review-bot``, make sure you
 have the latest version of `pip`_. To do so, run:
 
 .. code:: bash
