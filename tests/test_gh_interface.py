@@ -13,7 +13,7 @@ from review_bot.gh_interface import get_changed_files_and_contents
 
 # Should be this repository
 OWNER = "ansys"
-REPO = "hackathon-review-bot"
+REPO = "review-bot"
 
 
 def test_get_changed_files_and_contents():

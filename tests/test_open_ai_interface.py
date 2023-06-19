@@ -11,7 +11,7 @@ def test_patch_cpp():
     with pytest.raises(ValueError, match="No files matching"):
         _ = review_patch(
             "ansys",
-            "hackathon-review-bot",
+            "review-bot",
             2,
             use_src=False,
             filter_filename="tests/samples/cplus/function.cpp",
@@ -19,7 +19,7 @@ def test_patch_cpp():
 
     sugg = review_patch(
         "ansys",
-        "hackathon-review-bot",
+        "review-bot",
         4,
         use_src=False,
         filter_filename="tests/samples/cplus/function.cpp",
@@ -46,7 +46,7 @@ def test_patch_cpp():
 def test_patch_python():
     sugg = review_patch(
         "ansys",
-        "hackathon-review-bot",
+        "review-bot",
         4,
         use_src=True,
         filter_filename="tests/samples/py/functions.py",
