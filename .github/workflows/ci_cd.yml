@@ -13,7 +13,7 @@ env:
   LIBRARY_NAMESPACE: 'review_bot'
   # TODO: We need to request an Ansys-based CNAME... This involves
   # interaction with IT. Not done right away. Temporal solution
-  DOCUMENTATION_CNAME: 'ubiquitous-doodle-358y4g8.pages.github.io'
+  DOCUMENTATION_CNAME: 'ansys-internal.github.io/review-bot'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
