@@ -43,7 +43,7 @@ doc = [
     "ansys_sphinx_theme==0.9.9",
     "numpydoc==1.5.0",
     "Sphinx==7.0.1",
-    "sphinx-autoapi==2.1.0",
+    "sphinx-autoapi==2.1.1",
     "Sphinx-copybutton==0.5.2",
 ]
 
