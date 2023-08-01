@@ -37,6 +37,10 @@ html_theme_options = {
         ("PyAnsys", "https://docs.pyansys.com/"),
     ],
 }
+linkcheck_ignore = [
+    "https://github.com/ansys-internal/review-bot/actions/workflows/ci_cd.yml/badge.svg",
+    "https://github.com/ansys-internal/review-bot/actions/workflows/ci_cd.yml",
+]
 
 # Sphinx extensions
 extensions = [
