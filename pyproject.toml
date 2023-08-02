@@ -56,10 +56,10 @@ reviewbot = "review.bot.cli.cli:main"
 name = "review.bot"
 
 [project.urls]
-Source = "https://github.com/ansys-internal/review-bot"
-Tracker = "https://github.com/ansys-internal/review-bot/issues"
-Homepage = "https://github.com/ansys-internal/review-bot"
-
+Source = "https://github.com/ansys/review-bot"
+Tracker = "https://github.com/ansys/review-bot/issues"
+Homepage = "https://github.com/ansys/review-bot"
+Documentation = "https://review-bot.docs.pyansys.com"
 
 [tool.black]
 line-length = 100

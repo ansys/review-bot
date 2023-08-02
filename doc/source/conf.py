@@ -30,7 +30,7 @@ html_theme_options = {
         "version_match": get_version_match(__version__),
     },
     "check_switcher": False,
-    "github_url": "https://github.com/ansys-internal/review-bot",
+    "github_url": "https://github.com/ansys/review-bot",
     "show_prev_next": False,
     "show_breadcrumbs": True,
     "additional_breadcrumbs": [
@@ -38,8 +38,8 @@ html_theme_options = {
     ],
 }
 linkcheck_ignore = [
-    "https://github.com/ansys-internal/review-bot/actions/workflows/ci_cd.yml/badge.svg",
-    "https://github.com/ansys-internal/review-bot/actions/workflows/ci_cd.yml",
+    "https://github.com/ansys/review-bot/actions/workflows/ci_cd.yml/badge.svg",
+    "https://github.com/ansys/review-bot/actions/workflows/ci_cd.yml",
 ]
 
 # Sphinx extensions
