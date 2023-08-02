@@ -105,22 +105,25 @@ Additional required environment variables
 
 Apart from the GitHub access token and Azure OpenAI token, there are some additional environment variables that you need to set up to customize the behavior of the AI project. These variables allow you to fine-tune various aspects of the AI model and the OpenAI API integration. Below are the environment variables that need to be configured:
 
-1. **OPENAI_API_BASE:**
-   - Description: specifies the base URL of the OpenAI Azure API. It allows you to set the API endpoint for making requests to the OpenAI services.
-   - Example: `https://your-api-name.openai.azure.com`
+**OPENAI_API_BASE**
 
-2. **OPENAI_API_TYPE:**
-   - Description: defines the type of the OpenAI API. It is used to specify that you are using the Azure version of OpenAI.
-   - Example: `azure`
+* Description: specifies the base URL of the OpenAI Azure API. It allows you to set the API endpoint for making requests to the OpenAI services.
+* Example: `https://your-api-name.openai.azure.com`
 
-3. **OPENAI_API_VERSION:**
-   - Description: indicates the version of the OpenAI API to be used. It ensures compatibility with the specific version of the AI model.
-   - Example: `2023-05-15`
+**OPENAI_API_TYPE**
 
-4. **OPENAI_MODEL:**
-   - Description: allows users to select a particular AI model or engine provided by your Azure OpenAI deployment. You can check your deployment to see the names of your models. Different models may have varying capabilities and performance.
-   - Example: `gpt-3.5-turbo-france` or `text-davinci-002`
+* Description: defines the type of the OpenAI API. It is used to specify that you are using the Azure version of OpenAI.
+* Example: `azure`
 
+**OPENAI_API_VERSION**
+
+* Description: indicates the version of the OpenAI API to be used. It ensures compatibility with the specific version of the AI model.
+* Example: `2023-05-15`
+
+**OPENAI_MODEL**
+
+* Description: allows users to select a particular AI model or engine provided by your Azure OpenAI deployment. You can check your deployment to see the names of your models. Different models may have varying capabilities and performance.
+* Example: `gpt-3.5-turbo-france` or `text-davinci-002`
 
 With all of the environment variables properly configured, you are all set to leverage the full potential of the review bot.
 
