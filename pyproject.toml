@@ -28,7 +28,7 @@ dependencies = [
     "requests",
     "openai",
     "jsonschema",
-    "gitpython"
+    "gitpython",
 ]
 
 [project.optional-dependencies]
@@ -38,11 +38,13 @@ tests = [
     "pytest-retry==1.2.1",
     "requests==2.31.0",
     "openai==0.27.8",
+    "jsonschema==4.18.4",
+    "gitpython==3.1.32",
 ]
 doc = [
     "ansys_sphinx_theme==0.10.0",
     "numpydoc==1.5.0",
-    "Sphinx==7.1.1",
+    "Sphinx==7.1.2",
     "sphinx-autoapi==2.1.1",
     "Sphinx-copybutton==0.5.2",
 ]
