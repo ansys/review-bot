@@ -2,10 +2,10 @@ import warnings
 
 import pytest
 
-from review_bot import review_patch
+from review.bot import review_patch
 
 # Should be this repository
-OWNER = "ansys-internal"
+OWNER = "ansys"
 REPO = "review-bot"
 
 

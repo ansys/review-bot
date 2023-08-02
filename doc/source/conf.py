@@ -5,7 +5,7 @@ import os
 from ansys_sphinx_theme import get_version_match, pyansys_logo_black
 from sphinx.builders.latex import LaTeXBuilder
 
-from review_bot import __version__
+from review.bot import __version__
 
 LaTeXBuilder.supported_image_types = ["image/png", "image/pdf", "image/svg+xml"]
 
@@ -30,7 +30,7 @@ html_theme_options = {
         "version_match": get_version_match(__version__),
     },
     "check_switcher": False,
-    "github_url": "https://github.com/ansys-internal/review-bot",
+    "github_url": "https://github.com/ansys/review-bot",
     "show_prev_next": False,
     "show_breadcrumbs": True,
     "additional_breadcrumbs": [
@@ -38,8 +38,8 @@ html_theme_options = {
     ],
 }
 linkcheck_ignore = [
-    "https://github.com/ansys-internal/review-bot/actions/workflows/ci_cd.yml/badge.svg",
-    "https://github.com/ansys-internal/review-bot/actions/workflows/ci_cd.yml",
+    "https://github.com/ansys/review-bot/actions/workflows/ci_cd.yml/badge.svg",
+    "https://github.com/ansys/review-bot/actions/workflows/ci_cd.yml",
 ]
 
 # Sphinx extensions
@@ -101,7 +101,7 @@ master_doc = "index"
 
 # Configuration for Sphinx autoapi
 autoapi_type = "python"
-autoapi_dirs = ["../../src/review_bot"]
+autoapi_dirs = ["../../src/review/bot"]
 autoapi_options = [
     "members",
     "undoc-members",

@@ -1,18 +1,14 @@
 GitHub Reviewer bot
 ===================
 
-|pyansys| |GH-CI| |codecov| |MIT| |black|
+|pyansys| |GH-CI| |MIT| |black|
 
 .. |pyansys| image:: https://img.shields.io/badge/Py-Ansys-ffc107.svg?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAABDklEQVQ4jWNgoDfg5mD8vE7q/3bpVyskbW0sMRUwofHD7Dh5OBkZGBgW7/3W2tZpa2tLQEOyOzeEsfumlK2tbVpaGj4N6jIs1lpsDAwMJ278sveMY2BgCA0NFRISwqkhyQ1q/Nyd3zg4OBgYGNjZ2ePi4rB5loGBhZnhxTLJ/9ulv26Q4uVk1NXV/f///////69du4Zdg78lx//t0v+3S88rFISInD59GqIH2esIJ8G9O2/XVwhjzpw5EAam1xkkBJn/bJX+v1365hxxuCAfH9+3b9/+////48cPuNehNsS7cDEzMTAwMMzb+Q2u4dOnT2vWrMHu9ZtzxP9vl/69RVpCkBlZ3N7enoDXBwEAAA+YYitOilMVAAAAAElFTkSuQmCC
    :target: https://docs.pyansys.com/
    :alt: PyAnsys
 
-.. |codecov| image:: https://codecov.io/gh/ansys/review-bot/branch/main/graph/badge.svg
-   :target: https://codecov.io/gh/ansys/review-bot
-   :alt: Codecov
-
-.. |GH-CI| image:: https://github.com/ansys-internal/review-bot/actions/workflows/ci_cd.yml/badge.svg
-   :target: https://github.com/ansys-internal/review-bot/actions/workflows/ci_cd.yml
+.. |GH-CI| image:: https://github.com/ansys/review-bot/actions/workflows/ci_cd.yml/badge.svg
+   :target: https://github.com/ansys/review-bot/actions/workflows/ci_cd.yml
    :alt: GH-CI
 
 .. |MIT| image:: https://img.shields.io/badge/License-MIT-yellow.svg
@@ -64,9 +60,9 @@ Then, you can simply execute:
 
 
 Token configuration
-===================
+-------------------
 
-In order to use the AI project, you will need two tokens: a GitHub access token and an Azure OpenAI token. These tokens are essential for accessing the bot functionalities. 
+In order to use the AI project, you will need two tokens: a GitHub access token and an Azure OpenAI token. These tokens are essential for accessing the bot functionalities.
 Here are the links to the respective webpages for obtaining the required tokens:
 
 - `GitHub Access Token <https://github.com/settings/tokens>`_
@@ -76,8 +72,8 @@ Please ensure that you keep your tokens confidential and avoid sharing them publ
 
 Below, we outline the steps to obtain each token and how to set them up for your project.
 
-GitHub Access Token
--------------------
+GitHub access token
+^^^^^^^^^^^^^^^^^^^
 
 A GitHub access token is required to access the GitHub API for certain features, such as querying repositories, creating issues, and managing pull requests. Follow the steps below to obtain a GitHub access token:
 
@@ -92,7 +88,7 @@ A GitHub access token is required to access the GitHub API for certain features,
 5. **Configure the token:** to use the project with your GitHub access token, you should set it as an environment variable with the following name: `GITHUB_TOKEN`.
 
 Azure OpenAI token
-------------------
+^^^^^^^^^^^^^^^^^^
 
 The Azure OpenAI token is necessary to access the OpenAI API for utilizing advanced AI capabilities provided by the platform. Follow the steps below to obtain an Azure OpenAI token:
 
@@ -105,7 +101,7 @@ The Azure OpenAI token is necessary to access the OpenAI API for utilizing advan
 4. **Configure the token:** to use the project with your Azure OpenAI token, you should set it as an environment variable with the following name: `OPEN_AI_TOKEN`.
 
 Additional required environment variables
------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Apart from the GitHub access token and Azure OpenAI token, there are some additional environment variables that you need to set up to customize the behavior of the AI project. These variables allow you to fine-tune various aspects of the AI model and the OpenAI API integration. Below are the environment variables that need to be configured:
 
@@ -147,11 +143,11 @@ To use the CLI of the tool:
 
 .. code:: bash
 
-    reviewbot <-r path-to-repo> [-c path-to-openai-config] 
+    reviewbot <-r path-to-repo> [-c path-to-openai-config]
 
 
 A note on pre-commit
-^^^^^^^^^^^^^^^^^^^^
+--------------------
 
 The style checks take advantage of `pre-commit`_. Developers are encouraged to
 install this tool via:
