@@ -1,4 +1,4 @@
-# Contributing 
+# Contributing
 
 We absolutely welcome any code contributions and we hope that this
 guide will facilitate an understanding of the ``review-bot`` code

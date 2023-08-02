@@ -66,7 +66,7 @@ Then, you can simply execute:
 Token configuration
 ===================
 
-In order to use the AI project, you will need two tokens: a GitHub access token and an Azure OpenAI token. These tokens are essential for accessing the bot functionalities. 
+In order to use the AI project, you will need two tokens: a GitHub access token and an Azure OpenAI token. These tokens are essential for accessing the bot functionalities.
 Here are the links to the respective webpages for obtaining the required tokens:
 
 - `GitHub Access Token <https://github.com/settings/tokens>`_
@@ -147,7 +147,7 @@ To use the CLI of the tool:
 
 .. code:: bash
 
-    reviewbot <-r path-to-repo> [-c path-to-openai-config] 
+    reviewbot <-r path-to-repo> [-c path-to-openai-config]
 
 
 A note on pre-commit
