@@ -88,7 +88,7 @@ def open_logger(
     --------
     Output logging to stdout at the ``'INFO'`` level.
 
-    >>> import review.bot
+    >>> import review.bot as review_bot
     >>> review_bot.open_logger('INFO')
 
     """

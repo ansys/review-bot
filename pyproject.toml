@@ -50,10 +50,10 @@ doc = [
 ]
 
 [project.scripts]
-reviewbot = "review_bot.cli.cli:main"
+reviewbot = "review.bot.cli.cli:main"
 
 [tool.flit.module]
-name = "review_bot"
+name = "review.bot"
 
 [project.urls]
 Source = "https://github.com/ansys-internal/review-bot"
@@ -72,7 +72,7 @@ default_section = "THIRDPARTY"
 src_paths = ["doc", "src", "tests"]
 
 [tool.coverage.run]
-source = ["review_bot"]
+source = ["review.bot"]
 
 [tool.coverage.report]
 show_missing = true

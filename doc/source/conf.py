@@ -101,7 +101,7 @@ master_doc = "index"
 
 # Configuration for Sphinx autoapi
 autoapi_type = "python"
-autoapi_dirs = ["../../src/review_bot"]
+autoapi_dirs = ["../../src/review/bot"]
 autoapi_options = [
     "members",
     "undoc-members",
