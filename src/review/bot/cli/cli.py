@@ -3,7 +3,7 @@
 import argparse
 import os
 
-from review_bot import review_patch_local
+from review.bot import review_patch_local
 
 
 def show_review(args):

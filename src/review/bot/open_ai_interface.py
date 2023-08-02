@@ -4,11 +4,11 @@ from typing import Dict, List
 
 import openai
 
-import review_bot.defaults as defaults
-from review_bot.exceptions import EmptyOpenAIResponseException
-from review_bot.gh_interface import get_changed_files_and_contents
-from review_bot.git_interface import LocalGit
-from review_bot.misc import _set_open_ai_config, add_line_numbers, parse_suggestions
+import review.bot.defaults as defaults
+from review.bot.exceptions import EmptyOpenAIResponseException
+from review.bot.gh_interface import get_changed_files_and_contents
+from review.bot.git_interface import LocalGit
+from review.bot.misc import _set_open_ai_config, add_line_numbers, parse_suggestions
 
 LOG = logging.getLogger(__name__)
 LOG.setLevel("DEBUG")

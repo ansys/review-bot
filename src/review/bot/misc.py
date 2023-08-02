@@ -7,9 +7,9 @@ from typing import List
 
 import openai
 
-from review_bot.defaults import ACCESS_TOKEN, API_BASE, API_TYPE, API_VERSION
-from review_bot.exceptions import ValidationErrorException
-from review_bot.schema import validate_output
+from review.bot.defaults import ACCESS_TOKEN, API_BASE, API_TYPE, API_VERSION
+from review.bot.exceptions import ValidationErrorException
+from review.bot.schema import validate_output
 
 LOG = logging.getLogger(__name__)
 LOG.setLevel("DEBUG")
@@ -88,7 +88,7 @@ def open_logger(
     --------
     Output logging to stdout at the ``'INFO'`` level.
 
-    >>> import review_bot
+    >>> import review.bot
     >>> review_bot.open_logger('INFO')
 
     """

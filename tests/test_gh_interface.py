@@ -9,7 +9,7 @@ import os
 
 import pytest
 
-from review_bot.gh_interface import get_changed_files_and_contents
+from review.bot.gh_interface import get_changed_files_and_contents
 
 # Should be this repository
 OWNER = "ansys-internal"

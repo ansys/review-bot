@@ -4,7 +4,7 @@ import threading
 
 import requests
 
-from review_bot.misc import _get_gh_token
+from review.bot.misc import _get_gh_token
 
 LOG = logging.getLogger(__name__)
 LOG.setLevel("DEBUG")

@@ -10,7 +10,6 @@ on:
 env:
   MAIN_PYTHON_VERSION: '3.11'
   LIBRARY_NAME: 'review-bot'
-  LIBRARY_NAMESPACE: 'review_bot'
   # TODO: We need to request an Ansys-based CNAME... This involves
   # interaction with IT. Not done right away. Temporal solution
   DOCUMENTATION_CNAME: 'ansys-internal.github.io/review-bot'
@@ -56,7 +55,6 @@ jobs:
         uses: ansys/actions/build-wheelhouse@v4
         with:
           library-name: ${{ env.LIBRARY_NAME }}
-          library-namespace: ${{ env.LIBRARY_NAMESPACE }}
           operating-system: ${{ matrix.os }}
           python-version: ${{ matrix.python-version }}
 
