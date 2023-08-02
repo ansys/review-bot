@@ -35,7 +35,7 @@ dependencies = [
 tests = [
     "pytest==7.4.0",
     "pytest-cov==4.1.0",
-    "pytest-retry==1.2.1",
+    "pytest-retry==1.3.0",
     "requests==2.31.0",
     "openai==0.27.8",
     "jsonschema==4.18.4",
