@@ -10,9 +10,7 @@ on:
 env:
   MAIN_PYTHON_VERSION: '3.11'
   LIBRARY_NAME: 'review-bot'
-  # TODO: We need to request an Ansys-based CNAME... This involves
-  # interaction with IT. Not done right away. Temporal solution
-  DOCUMENTATION_CNAME: 'ansys-internal.github.io/review-bot'
+  DOCUMENTATION_CNAME: 'review-bot.docs.pyansys.com'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
