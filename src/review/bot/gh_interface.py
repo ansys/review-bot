@@ -1,3 +1,4 @@
+# Copyright (c) 2023 ANSYS, Inc. All rights reserved
 """Contains functions to interface with GitHub."""
 import logging
 import threading

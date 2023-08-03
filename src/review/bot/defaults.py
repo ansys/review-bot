@@ -1,3 +1,4 @@
+# Copyright (c) 2023 ANSYS, Inc. All rights reserved
 """Default variables for the project."""
 
 import os

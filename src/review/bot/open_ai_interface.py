@@ -1,3 +1,4 @@
+# Copyright (c) 2023 ANSYS, Inc. All rights reserved
 """Functions to interface with OpenAI."""
 import logging
 from typing import Dict, List
