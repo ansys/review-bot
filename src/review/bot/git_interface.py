@@ -1,3 +1,4 @@
+# Copyright (c) 2023 ANSYS, Inc. All rights reserved
 """Interface module for local GIT files."""
 import os
 from pathlib import Path
