@@ -102,7 +102,7 @@ Azure OpenAI token
 ^^^^^^^^^^^^^^^^^^
 
 The Azure OpenAI token is required to access the OpenAI API for utilizing the advanced AI
-capabilities provided by `Microsoft Azure` <https://portal.azure.com/>`_.
+capabilities provided by `Microsoft Azure <https://portal.azure.com/>`_.
 
 To obtain an Azure OpenAI token, perform these steps:
 
