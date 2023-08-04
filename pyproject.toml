@@ -5,7 +5,7 @@ build-backend = "flit_core.buildapi"
 [project]
 # Check https://flit.readthedocs.io/en/latest/pyproject_toml.html for all available sections
 name = "review-bot"
-version = "0.1.dev0"
+version = "0.1.0"
 description = "A Python library to automatically generate suggestions and improvements for patches in GitHub PRs by leveraging the power of OpenAI."
 readme = "README.rst"
 requires-python = ">=3.8"
