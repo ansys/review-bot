@@ -70,7 +70,7 @@ accessing the bot functionalities:
 
 Subsequent sections explain how to obtain these tokens and set them up for your project.
 
-Ensure that you keep your tokens confidential and do not share them publicly.Additionally,
+Ensure that you keep your tokens confidential and do not share them publicly. Additionally,
 always follow the best security practices to protect your project and data from unauthorized
 access.
 
