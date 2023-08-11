@@ -1,9 +1,17 @@
 # Copyright (c) 2023 ANSYS, Inc. All rights reserved
 """Interface module for local GIT files."""
+import logging
 import os
 from pathlib import Path
 
-from git import Repo
+LOG = logging.getLogger(__name__)
+LOG.setLevel("DEBUG")
+
+try:
+    from git import Repo
+except ImportError as err:
+    LOG.warning(f"Error while importing git: {err}")
+    LOG.warning(f"Usage of review_bot might lead to errors.")
 
 
 class LocalGit:
