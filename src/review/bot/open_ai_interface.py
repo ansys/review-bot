@@ -7,6 +7,8 @@ import openai
 
 import review.bot.defaults as defaults
 from review.bot.exceptions import EmptyOpenAIResponseException
+from review.bot.gh_interface import get_changed_files_and_contents
+from review.bot.git_interface import LocalGit
 from review.bot.misc import _set_open_ai_config, add_line_numbers, parse_suggestions
 
 LOG = logging.getLogger(__name__)
@@ -51,8 +53,6 @@ def review_patch(
     list[dict]
         A dictionary containing suggestions for the reviewed patch.
     """
-    from review.bot.gh_interface import get_changed_files_and_contents
-
     # Fetch changed files and contents
     changed_files = get_changed_files_and_contents(
         owner, repo, pr, gh_access_token=gh_access_token
@@ -112,8 +112,6 @@ def review_patch_local(
     list[dict]
         A dictionary containing suggestions for the reviewed patch.
     """
-    from review.bot.git_interface import LocalGit
-
     # load repo and change branch if it applies
     local_repo = LocalGit(repo)
     if branch is not None:
