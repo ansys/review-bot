@@ -26,6 +26,7 @@ def review_patch(
     use_src=False,
     filter_filename=None,
     gh_access_token=None,
+    docs_only=False,
     config_file: str = None,
 ):
     """Review a patch in a pull request and generate suggestions for improvement.
@@ -69,10 +70,17 @@ def review_patch(
             continue
 
         patch = add_line_numbers(file_data["patch"])
-        if use_src:
+        if docs_only:
             file_src = f"FILENAME: {filename}\nCONTENT:\n{file_data['file_text']}"
             suggestions.extend(
-                generate_suggestions_with_source(filename, file_src, patch, config_file)
+                generate_suggestions(
+                    filename, file_src, patch, config_file, docs_only=True
+                )
+            )
+        elif use_src:
+            file_src = f"FILENAME: {filename}\nCONTENT:\n{file_data['file_text']}"
+            suggestions.extend(
+                generate_suggestions(filename, file_src, patch, config_file)
             )
         else:
             suggestions.extend(generate_suggestions(filename, patch))
@@ -145,6 +153,117 @@ def review_patch_local(
     return suggestions
 
 
+def message_generation(
+    patch: str, filename: str, file_src: str = None, docs_only: bool = False
+):
+    """Generate the required message for each type of query request.
+
+    Parameters
+    ----------
+    filename : str
+        Name of the file being patched.
+    patch : str
+        The patch text containing line numbers and changes.
+    file_src : str
+        The source file text including the file name and its contents.
+    docs_only: True
+        Flag to select whether to review the documentation only or not.
+
+    Returns
+    -------
+    list[dict]
+        A dictionary containing suggestions for the reviewed patch.
+    """
+    messages = []
+    if file_src:
+        messages = [
+            {
+                "role": "system",
+                "content": """
+You are a GitHub review bot.  You first expect the full source of the file to be reviewed followed by the patch which contains the line number. You respond after the full source file with 'Ready for the patch.'. After the patch, you provide 'review items' to improve just the patch code using the context from the full source file. Do not include the line numbers in any code suggestions. There are 3 TYPEs of review items [GLOBAL, SUGGESTION, INFO]. Each review item must be in the format [<FILENAME>], [<LINE-START>(-<LINE-END>)], [TYPE]: <Review text>
+
+Type: GLOBAL
+This must always included. This is a general overview of the file patch. If the file looks good, simply respond with "No issues found, LGTM!". Otherwise, indicate the kind of comments and suggestions that will be given in the files tab. Make this section short and do not include any line numbers (i.e., leave [<LINE-START>(-<LINE-END>)] empty.
+
+Type: SUGGESTION
+This is where code must be changed or should be changed. If you are replacing code, it must use the GitHub markdown code block with ```suggestion, and the [<LINE-START>-<LINE-END>] must match the line(s) that will be replaced. If you are adding new code, you should only include the [<LINE-START>] where you expect the code to be inserted. Do not insert code that is outside of the patch.
+
+Type: INFO
+This is for comments that do not include code that you want to replace. These should be logical errors, style suggestions, or other issues with the code. You can feel free to include example code, and if you do use markdown formatting, but this is primarily for text comments.
+""",
+            },
+            {"role": "user", "content": file_src},
+            {"role": "assistant", "content": "Ready for the patch."},
+            {
+                "role": "user",
+                "content": f"{patch}\n\nReview the above code patch and provide recommendations for improvement or point out errors.",
+            },
+        ]
+    elif docs_only and file_src:
+        messages = [
+            {
+                "role": "system",
+                "content": """
+You are a technical writer and grammar expert.
+You want to improve docstrings in your Python client library.
+You want docstrings in the numpydoc format.
+You want complete sentences, with verbs in the present tense.
+You never want to combine sentences.
+You want to use double backticks to surround the names of classes, functions, methods, parameters, parameter options, attributes, and data objects.
+You want to use Oxford commas and omit articles from the beginning of descriptions for parameters, attributes, properties, and return values.
+You want to capitalize only proper nouns.
+            """,
+            },
+            {"role": "user", "content": file_src},
+            {"role": "assistant", "content": "Ready for the doc review."},
+            {
+                "role": "user",
+                "content": f"""Improve this module, adding numpydoc docstrings where missing.
+End all descriptions with a period. Keep sentences short and simple. Omit unnecessary commas.
+For method and function descriptions, start the docstring with a simple verb (no "s" or "es" at the end of the verb).
+For class descriptions, start the docstring with a verb ending in an "s" or "es".
+Place names of classes, methods, parameters, data objects, and commands in double backticks (``).
+Follow code in backticks with the noun describing whether this code represents (such as a method, function, parameter, or command).
+When specifying a default parameter value, use the format "The default is ..., in which case the ...." Place the default value in double backticks.
+When the default value is "None", format it as ``None``.
+Instead of "used to" before a verb, replace with "for" and the gerund form of the verb.
+Instead of "to be" before a verb ending in "ed", replace with "to" and the simple verb form (without the "ed".
+For a boolean parameter, start the description with "Whether ..."
+For a boolean return value, use the description "``True`` when successful, ``False`` when failed."
+For property descriptions, use only a noun string followed by a period.
+Replace the Latin phrase "e.g." with "for example" and the Latin phrase "i.e." with "that is". Begin a new sentence with "For example,". Do not include as part of the previous sentence.
+Replace "Retrieve", "Obtain", "Find", and "Return" with "Get".
+Spell ANSYS as Ansys, hfss as HFSS, edb as EDB, boolean as Boolean.
+Provide a summary of the changes that are made.""",
+            },
+        ]
+    else:
+        messages = [
+            {
+                "role": "system",
+                "content": """
+You are a GitHub review bot.  You first expect full filename. You then expect a patch from a GitHub pull request and you provide 'review items' to improve just the patch code using the context from the full source file. Do not include the line numbers in any code suggestions. There are 3 TYPEs of review items [GLOBAL, SUGGESTION, COMMENT]. Each review item must be in the format [<FILENAME>], [<LINE-START>(-<LINE-END>)], [TYPE], always between brackets: <Review text>
+
+Type: GLOBAL
+This must always included. This is a general overview of the file patch. If the file looks good, simply respond with "No issues found, LGTM!". Otherwise, indicate the kind of comments and suggestions that follow. Make this section short and do not include any line numbers (i.e., leave [<LINE-START>(-<LINE-END>)] empty.
+
+Type: SUGGESTION
+This is where code must be changed or should be changed. If you are replacing code, it must use the GitHub markdown code block with ```suggestion, and the [<LINE-START>-<LINE-END>] must match the line(s) that will be replaced. If you are adding new code, you should only include the [<LINE-START>] where you expect the code to be inserted. Do not insert code that is outside of the patch.
+
+Type: COMMENT
+This is for comments that do not include code that you want to replace. These should be logical errors, style suggestions, or other issues with the code. You can feel free to include example code, and if you do use markdown formatting, but this is primarily for text comments.
+""",
+            },
+            {"role": "user", "content": filename},
+            {"role": "assistant", "content": "Ready for the patch."},
+            {
+                "role": "user",
+                "content": f"{patch}\n\nReview the above code patch and provide recommendations for improvement or point out errors.",
+            },
+        ]
+    return messages
+
+
 def generate_suggestions_with_source(
     filename, file_src, patch, config_file: str = None
 ) -> List[Dict[str, str]]:
@@ -170,33 +289,8 @@ def generate_suggestions_with_source(
     LOG.debug("Generating suggestions for a given file source and patch.")
     LOG.debug("FILENAME: %s", filename)
     LOG.debug("PATCH: %s", patch)
-
-    response = openai.ChatCompletion.create(
-        engine=OPEN_AI_MODEL,
-        messages=[
-            {
-                "role": "system",
-                "content": """
-You are a GitHub review bot.  You first expect the full source of the file to be reviewed followed by the patch which contains the line number. You respond after the full source file with 'Ready for the patch.'. After the patch, you provide 'review items' to improve just the patch code using the context from the full source file. Do not include the line numbers in any code suggestions. There are 3 TYPEs of review items [GLOBAL, SUGGESTION, INFO]. Each review item must be in the format [<FILENAME>], [<LINE-START>(-<LINE-END>)], [TYPE]: <Review text>
-
-Type: GLOBAL
-This must always included. This is a general overview of the file patch. If the file looks good, simply respond with "No issues found, LGTM!". Otherwise, indicate the kind of comments and suggestions that will be given in the files tab. Make this section short and do not include any line numbers (i.e., leave [<LINE-START>(-<LINE-END>)] empty.
-
-Type: SUGGESTION
-This is where code must be changed or should be changed. If you are replacing code, it must use the GitHub markdown code block with ```suggestion, and the [<LINE-START>-<LINE-END>] must match the line(s) that will be replaced. If you are adding new code, you should only include the [<LINE-START>] where you expect the code to be inserted. Do not insert code that is outside of the patch.
-
-Type: INFO
-This is for comments that do not include code that you want to replace. These should be logical errors, style suggestions, or other issues with the code. You can feel free to include example code, and if you do use markdown formatting, but this is primarily for text comments.
-""",
-            },
-            {"role": "user", "content": file_src},
-            {"role": "assistant", "content": "Ready for the patch."},
-            {
-                "role": "user",
-                "content": f"{patch}\n\nReview the above code patch and provide recommendations for improvement or point out errors.",
-            },
-        ],
-    )
+    messages = message_generation(patch=patch, filename=filename, file_src=file_src)
+    response = openai.ChatCompletion.create(engine=OPEN_AI_MODEL, messages=messages)
     # Extract suggestions
     LOG.debug(response)
     text = response["choices"][0].message.content
@@ -206,7 +300,7 @@ This is for comments that do not include code that you want to replace. These sh
 
 
 def generate_suggestions(
-    filename, patch, config_file: str = None
+    filename, patch, file_src=None, config_file: str = None, docs_only=False
 ) -> List[Dict[str, str]]:
     """
     Generate suggestions for a given file source and patch.
@@ -229,34 +323,11 @@ def generate_suggestions(
     LOG.debug("Generating suggestions for a given file source and patch.")
     LOG.debug("FILENAME: %s", filename)
     LOG.debug("PATCH: %s", patch)
-
-    response = openai.ChatCompletion.create(
-        engine=OPEN_AI_MODEL,
-        messages=[
-            {
-                "role": "system",
-                "content": """
-You are a GitHub review bot.  You first expect full filename. You then expect a patch from a GitHub pull request and you provide 'review items' to improve just the patch code using the context from the full source file. Do not include the line numbers in any code suggestions. There are 3 TYPEs of review items [GLOBAL, SUGGESTION, COMMENT]. Each review item must be in the format [<FILENAME>], [<LINE-START>(-<LINE-END>)], [TYPE], always between brackets: <Review text>
-
-Type: GLOBAL
-This must always included. This is a general overview of the file patch. If the file looks good, simply respond with "No issues found, LGTM!". Otherwise, indicate the kind of comments and suggestions that follow. Make this section short and do not include any line numbers (i.e., leave [<LINE-START>(-<LINE-END>)] empty.
-
-Type: SUGGESTION
-This is where code must be changed or should be changed. If you are replacing code, it must use the GitHub markdown code block with ```suggestion, and the [<LINE-START>-<LINE-END>] must match the line(s) that will be replaced. If you are adding new code, you should only include the [<LINE-START>] where you expect the code to be inserted. Do not insert code that is outside of the patch.
-
-Type: COMMENT
-This is for comments that do not include code that you want to replace. These should be logical errors, style suggestions, or other issues with the code. You can feel free to include example code, and if you do use markdown formatting, but this is primarily for text comments.
-""",
-            },
-            {"role": "user", "content": filename},
-            {"role": "assistant", "content": "Ready for the patch."},
-            {
-                "role": "user",
-                "content": f"{patch}\n\nReview the above code patch and provide recommendations for improvement or point out errors.",
-            },
-        ],
-        # n=3,
+    messages = message_generation(
+        patch=patch, filename=filename, file_src=file_src, docs_only=docs_only
     )
+
+    response = openai.ChatCompletion.create(engine=OPEN_AI_MODEL, messages=messages)
     LOG.debug(response)
     # Extract suggestions
     text = response["choices"][0].message.content
