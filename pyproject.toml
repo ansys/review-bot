@@ -40,7 +40,7 @@ tests = [
     "pytest-cov==4.1.0",
     "pytest-retry==1.4.1",
     "requests==2.31.0",
-    "openai==0.27.9",
+    "openai==0.27.10",
     "jsonschema==4.19.0",
     "gitpython==3.1.32",
 ]
