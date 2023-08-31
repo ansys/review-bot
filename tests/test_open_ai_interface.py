@@ -54,6 +54,7 @@ def test_patch_python():
         4,
         use_src=True,
         filter_filename="tests/samples/py/functions.py",
+        docs_only=True,
     )
 
     assert isinstance(sugg, list)
@@ -81,7 +82,7 @@ def test_docs_python():
         REPO,
         4,
         use_src=True,
-        filter_filename="tests/samples/py/functions.py",
+        filter_filename="tests/samples/py/functions_no_docs.py",
         docs_only=True,
     )
 
