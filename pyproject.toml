@@ -42,7 +42,7 @@ tests = [
     "requests==2.31.0",
     "openai==0.28.0",
     "jsonschema==4.19.1",
-    "gitpython==3.1.36",
+    "gitpython==3.1.37",
 ]
 doc = [
     "ansys_sphinx_theme==0.11.2",
