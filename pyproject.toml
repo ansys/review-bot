@@ -36,19 +36,19 @@ dependencies = [
 
 [project.optional-dependencies]
 tests = [
-    "pytest==7.4.0",
+    "pytest==7.4.2",
     "pytest-cov==4.1.0",
-    "pytest-retry==1.4.1",
+    "pytest-retry==1.5.0",
     "requests==2.31.0",
-    "openai==0.27.9",
-    "jsonschema==4.19.0",
-    "gitpython==3.1.32",
+    "openai==0.28.1",
+    "jsonschema==4.19.1",
+    "gitpython==3.1.37",
 ]
 doc = [
-    "ansys_sphinx_theme==0.10.4",
-    "numpydoc==1.5.0",
-    "Sphinx==7.2.3",
-    "sphinx-autoapi==2.1.1",
+    "ansys_sphinx_theme==0.12.3",
+    "numpydoc==1.6.0",
+    "Sphinx==7.2.6",
+    "sphinx-autoapi==3.0.0",
     "Sphinx-copybutton==0.5.2",
 ]
 
