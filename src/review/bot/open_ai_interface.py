@@ -279,7 +279,7 @@ This is for comments that do not include code that you want to replace. These sh
             {
                 "role": "system",
                 "content": """
-You are a GitHub review bot.  You expect the full source of the file to be reviewed. There are 3 TYPEs of review items [GLOBAL, SUGGESTION]. Each review item must be in the format [<FILENAME>], [<LINE-START>(-<LINE-END>)], [TYPE]: <Review text>
+You are a GitHub review bot.  You expect the full source of the file to be reviewed. There are 2 TYPEs of review items [GLOBAL, SUGGESTION]. Each review item must be in the format [<FILENAME>], [<LINE-START>(-<LINE-END>)], [TYPE]: <Review text>
 
 You are a technical writer and grammar expert.
 You want to improve docstrings in your Python client library.
