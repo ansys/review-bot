@@ -2,7 +2,7 @@ import warnings
 
 import pytest
 
-from review.bot import review_patch
+from review.bot import review_file, review_folder, review_patch
 
 # Should be this repository
 OWNER = "ansys"
@@ -93,3 +93,29 @@ def test_docs_python():
             UserWarning,
         )
         return
+
+
+@pytest.mark.flaky(retries=3, delay=5)
+def test_single_file_review():
+    filename = "function.cpp"
+    sugg = review_file(
+        OWNER,
+        REPO,
+        4,
+        filename=filename,
+    )
+    for suggestion in sugg:
+        assert filename in suggestion["filename"]
+
+
+@pytest.mark.flaky(retries=3, delay=5)
+def test_folder_review():
+    folder = "cplus"
+    sugg = review_folder(
+        OWNER,
+        REPO,
+        4,
+        folder=folder,
+    )
+    for suggestion in sugg:
+        assert folder in suggestion["filename"]

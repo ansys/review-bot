@@ -8,11 +8,9 @@ repos:
   - id: isort
 
 - repo: https://github.com/psf/black
-  rev: 23.7.0  # IF VERSION CHANGES --> MODIFY "blacken-docs" MANUALLY AS WELL!!
+  rev: 23.9.1  # IF VERSION CHANGES --> MODIFY "blacken-docs" MANUALLY AS WELL!!
   hooks:
   - id: black
-    args:
-      - --line-length=88
 
 - repo: https://github.com/adamchainz/blacken-docs
   rev: 1.15.0

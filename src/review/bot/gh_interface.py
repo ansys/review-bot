@@ -13,9 +13,7 @@ LOG.setLevel("DEBUG")
 
 def _fetch_file_content(file_data, headers):
     """Fetch the content of a single file."""
-    content_response = requests.get(
-        file_data["contents_url"], headers=headers, timeout=10
-    )
+    content_response = requests.get(file_data["contents_url"], headers=headers, timeout=10)
 
     if content_response.status_code == 200:
         content = content_response.json()
@@ -73,20 +71,6 @@ def get_changed_files_and_contents(owner, repo, pull_number, gh_access_token=Non
 
     """
     access_token = _get_gh_token() if gh_access_token is None else gh_access_token
-    url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pull_number}"
-    # url = f"https://github.com/{owner}/{repo}/pull/{pull_number}.diff"
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        # "Content-type": "application/vnd.github.diff",
-    }
-
-    response = requests.get(url, headers=headers, timeout=10)
-    if response.status_code != 200:
-        raise RuntimeError(
-            f"Error fetching pull request files from:\n{url}\n\n{response.status_code}"
-        )
-
-    files = response.json()
 
     url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pull_number}/files"
     headers = {"Authorization": f"Bearer {access_token}"}
