@@ -3,13 +3,11 @@
 import logging
 from typing import Dict, List
 
-import openai
-
 import review.bot.defaults as defaults
 from review.bot.exceptions import EmptyOpenAIResponseException
 from review.bot.gh_interface import get_changed_files_and_contents
 from review.bot.git_interface import LocalGit
-from review.bot.misc import _set_open_ai_config, add_line_numbers, parse_suggestions
+from review.bot.misc import add_line_numbers, get_client, parse_suggestions
 
 LOG = logging.getLogger(__name__)
 LOG.setLevel("DEBUG")
@@ -166,13 +164,13 @@ def generate_suggestions_with_source(
     list[dict]
         A list of dictionaries containing suggestions for the patch.
     """
-    _set_open_ai_config(config_file)
+    client = get_client(config_file)
     LOG.debug("Generating suggestions for a given file source and patch.")
     LOG.debug("FILENAME: %s", filename)
     LOG.debug("PATCH: %s", patch)
 
-    response = openai.ChatCompletion.create(
-        engine=OPEN_AI_MODEL,
+    response = client.chat.completions.create(
+        model=OPEN_AI_MODEL,
         messages=[
             {
                 "role": "system",
@@ -199,7 +197,7 @@ This is for comments that do not include code that you want to replace. These sh
     )
     # Extract suggestions
     LOG.debug(response)
-    text = response["choices"][0].message.content
+    text = response.choices[0].message.content
     if len(text) == 0:
         raise EmptyOpenAIResponseException()
     return parse_suggestions(text)
@@ -225,13 +223,13 @@ def generate_suggestions(
     list[dict]
         A list of dictionaries containing suggestions for the patch.
     """
-    _set_open_ai_config(config_file)
+    client = get_client(config_file)
     LOG.debug("Generating suggestions for a given file source and patch.")
     LOG.debug("FILENAME: %s", filename)
     LOG.debug("PATCH: %s", patch)
 
-    response = openai.ChatCompletion.create(
-        engine=OPEN_AI_MODEL,
+    response = client.chat.completions.create(
+        model=OPEN_AI_MODEL,
         messages=[
             {
                 "role": "system",
@@ -259,7 +257,7 @@ This is for comments that do not include code that you want to replace. These sh
     )
     LOG.debug(response)
     # Extract suggestions
-    text = response["choices"][0].message.content
+    text = response.choices[0].message.content
     if len(text) == 0:
         raise EmptyOpenAIResponseException()
     return parse_suggestions(text)
