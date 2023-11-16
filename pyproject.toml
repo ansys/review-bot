@@ -32,7 +32,6 @@ dependencies = [
     "openai",
     "jsonschema",
     "gitpython",
-    "beartype",
 ]
 
 [project.optional-dependencies]
