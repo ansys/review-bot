@@ -5,7 +5,8 @@ import logging
 import os
 import re
 
-from beartype.typing import List, Union
+from typing import List, Union
+
 from openai import AzureOpenAI, OpenAI
 
 from review.bot.defaults import ACCESS_TOKEN, API_BASE, API_TYPE, API_VERSION
