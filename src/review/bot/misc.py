@@ -4,7 +4,6 @@ import json
 import logging
 import os
 import re
-
 from typing import List, Union
 
 from openai import AzureOpenAI, OpenAI
