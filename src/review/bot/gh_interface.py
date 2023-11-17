@@ -77,8 +77,9 @@ def get_changed_files_and_contents(owner, repo, pull_number, gh_access_token=Non
     response = requests.get(url, headers=headers, timeout=10)
 
     if response.status_code != 200:
-        print(f"Error fetching pull request files: {response.status_code}")
-        return
+        raise RuntimeError(
+            f"Error fetching pull request files from:\n{url}\n\n{response.status_code}"
+        )
 
     files = response.json()
     threads = []
