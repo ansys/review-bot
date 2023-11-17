@@ -71,17 +71,13 @@ def get_client(config_file: str = None) -> Union[OpenAI, AzureOpenAI]:
         raise OSError('Missing "OPEN_AI_TOKEN" environment variable')
 
     if api_type == "azure":
-        client = AzureOpenAI(
-            azure_endpoint=api_base, api_key=access_token, api_version=api_version
-        )
+        client = AzureOpenAI(azure_endpoint=api_base, api_key=access_token, api_version=api_version)
     else:
         client = OpenAI(api_key=access_token)
     return client
 
 
-def open_logger(
-    loglevel="DEBUG", formatstr="%(name)-20s - %(levelname)-8s - %(message)s"
-):
+def open_logger(loglevel="DEBUG", formatstr="%(name)-20s - %(levelname)-8s - %(message)s"):
     """Start logging to standard output.
 
     Parameters
@@ -301,13 +297,9 @@ def parse_suggestions(text_block: str):
                     "Suggestion does not contain a path to a file in the proper position, it will be ignored."
                 )
         else:
-            LOG.warning(
-                "Suggestion is missing some section, this suggestion will be ignored."
-            )
+            LOG.warning("Suggestion is missing some section, this suggestion will be ignored.")
     if not validate_output(suggestions):
-        raise ValidationErrorException(
-            "Output format is not well formed.", llm_output=text_block
-        )
+        raise ValidationErrorException("Output format is not well formed.", llm_output=text_block)
     if len(suggestions) == 0:
         raise ValidationErrorException(
             "Output is empty due to all suggestions being malformed.",
