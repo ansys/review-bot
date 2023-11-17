@@ -4,9 +4,9 @@ import json
 import logging
 import os
 import re
-from typing import List
+from typing import List, Union
 
-import openai
+from openai import AzureOpenAI, OpenAI
 
 from review.bot.defaults import ACCESS_TOKEN, API_BASE, API_TYPE, API_VERSION
 from review.bot.exceptions import ValidationErrorException
@@ -24,8 +24,24 @@ def _get_gh_token():
     return access_token
 
 
-def _set_open_ai_config(config_file: str = None):
-    """Return the github access token from the GITHUB_TOKEN environment variable."""
+def get_client(config_file: str = None) -> Union[OpenAI, AzureOpenAI]:
+    """Get the OpenAI client with the configuration file initialization.
+
+    Parameters
+    ----------
+    config_file : str, optional
+        Initialization parameters of the client, by default None.
+
+    Returns
+    -------
+    Union[OpenAI, AzureOpenAI]
+        Initialized OpenAI client.
+
+    Raises
+    ------
+    OSError
+        Thrown if access token is missing.
+    """
     if config_file is not None:
         with open(config_file) as json_file:
             config = json.load(json_file)
@@ -54,11 +70,13 @@ def _set_open_ai_config(config_file: str = None):
     if access_token is None:
         raise OSError('Missing "OPEN_AI_TOKEN" environment variable')
 
-    openai.api_key = access_token
     if api_type == "azure":
-        openai.api_base = api_base
-        openai.api_type = api_type
-        openai.api_version = api_version
+        client = AzureOpenAI(
+            azure_endpoint=api_base, api_key=access_token, api_version=api_version
+        )
+    else:
+        client = OpenAI(api_key=access_token)
+    return client
 
 
 def open_logger(
