@@ -4,6 +4,7 @@ on: pull_request
 permissions:
   pull-requests: write
   contents: write
+
 jobs:
   dependabot:
     runs-on: ubuntu-latest
@@ -15,6 +16,9 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Print actor
+        run: echo "Actor is ${{github.actor}}"
+
       - name: Approve a PR
         run: gh pr review --approve "$PR_URL"
         env:
@@ -23,7 +27,7 @@ jobs:
 
       - name: Enable auto-merge for Dependabot PRs
         if: steps.metadata.outputs.update-type != 'version-update:semver-major'
-        run: gh pr merge --auto --merge "$PR_URL"
+        run: gh pr merge --auto --squash "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
