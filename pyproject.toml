@@ -36,7 +36,7 @@ dependencies = [
 
 [project.optional-dependencies]
 tests = [
-    "pytest==8.0.1",
+    "pytest==8.0.2",
     "pytest-cov==4.1.0",
     "pytest-retry==1.6.2",
     "requests==2.31.0",
