@@ -1,0 +1,12 @@
+diff --git a/mesh/AnalysisInfo.h b/mesh/AnalysisInfo.h
+index a48c431..6f8142b 100644
+--- a/mesh/AnalysisInfo.h
++++ b/mesh/AnalysisInfo.h
+@@ -190,6 +190,7 @@ class MeshAnalysisInfo : public AnalysisInfo
+     double dOccGeometryVolume = 0;
+     double dSurfaceArea = 0;
+     double dMeshingDuration = 0;          // time in seconds to tet mesh
++    double dPrimeFileIODuration = 0;      // time in seconds to read/write prime files
+     double dTetVolume = 0;                // tet volume before projection
+     double dTetVolumeAfterProjection = 0; // tet volume after projection
+     double dVolumeDiffPercent = 0;
