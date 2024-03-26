@@ -1,0 +1,223 @@
+:py:mod:`review.bot.open_ai_interface`
+======================================
+
+.. py:module:: review.bot.open_ai_interface
+
+.. autoapi-nested-parse::
+
+   Functions to interface with OpenAI.
+
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   review.bot.open_ai_interface.review_patch
+   review.bot.open_ai_interface.review_patch_local
+   review.bot.open_ai_interface.generate_suggestions_with_source
+   review.bot.open_ai_interface.generate_suggestions
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   review.bot.open_ai_interface.LOG
+   review.bot.open_ai_interface.OPEN_AI_MODEL
+
+
+.. py:data:: LOG
+
+   
+
+.. py:data:: OPEN_AI_MODEL
+
+   
+
+.. py:function:: review_patch(owner, repo, pr, use_src=False, filter_filename=None, gh_access_token=None, config_file: str = None)
+
+   
+   Review a patch in a pull request and generate suggestions for improvement.
+
+
+   :Parameters:
+
+       **owner** : :class:`python:str`
+           The GitHub owner/organization of the repository.
+
+       **repo** : :class:`python:str`
+           The name of the repository on GitHub.
+
+       **pr** : :class:`python:str`
+           The pull request number.
+
+       **use_src** : :ref:`bool <python:bltin-boolean-values>`, default: :data:`python:False`
+           Use the source file as context for the patch. Works for small files and
+           not for large ones.
+
+       **filter_filename** : :class:`python:str`, :obj:`optional`
+           If set, filters out all but the file matching this string.
+
+       **gh_access_token** : :class:`python:str`, :obj:`optional`
+           GitHub token needed to communicate with the repository. By default, ``None``,
+           which means it will try to read an existing env variable named ``GITHUB_TOKEN``.
+
+       **config_file** : :class:`python:str`, :obj:`optional`
+           Path to OpenAI configuration file. By default, ``None``.
+
+       **Returns**
+           ..
+
+       **-------**
+           ..
+
+       **list[dict]**
+           A dictionary containing suggestions for the reviewed patch.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: review_patch_local(repo: str, branch: str = None, use_src=False, filter_filename=None, config_file: str = None)
+
+   
+   Review a patch in a pull request and generate suggestions for improvement.
+
+
+   :Parameters:
+
+       **repo** : :class:`python:str`
+           The path to the local repository.
+
+       **branch** : :class:`python:str`
+           Name of the branch you want to compare to main. By default, current branch.
+
+       **use_src** : :ref:`bool <python:bltin-boolean-values>`, default: :data:`python:False`
+           Use the source file as context for the patch. Works for small files and
+           not for large ones.
+
+       **filter_filename** : :class:`python:str`, :obj:`optional`
+           If set, filters out all but the file matching this string.
+
+       **config_file** : :class:`python:str`, :obj:`optional`
+           Path to OpenAI configuration file. By default, ``None``.
+
+   :Returns:
+
+       :class:`python:list`\[:class:`python:dict`]
+           A dictionary containing suggestions for the reviewed patch.
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: generate_suggestions_with_source(filename, file_src, patch, config_file: str = None) -> List[Dict[str, str]]
+
+   
+   Generate suggestions for a given file source and patch.
+
+
+   :Parameters:
+
+       **filename** : :class:`python:str`
+           Name of the file being patched.
+
+       **file_src** : :class:`python:str`
+           The source file text including the file name and its contents.
+
+       **patch** : :class:`python:str`
+           The patch text containing line numbers and changes.
+
+       **config_file** : :class:`python:str`, :obj:`optional`
+           Path to OpenAI configuration file. By default, ``None``.
+
+   :Returns:
+
+       :class:`python:list`\[:class:`python:dict`]
+           A list of dictionaries containing suggestions for the patch.
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: generate_suggestions(filename, patch, config_file: str = None) -> List[Dict[str, str]]
+
+   
+   Generate suggestions for a given file source and patch.
+
+
+   :Parameters:
+
+       **filename** : :class:`python:str`
+           Name of the file being patched.
+
+       **patch** : :class:`python:str`
+           The patch text containing line numbers and changes.
+
+       **config_file** : :class:`python:str`, :obj:`optional`
+           Path to OpenAI configuration file. By default, ``None``.
+
+   :Returns:
+
+       :class:`python:list`\[:class:`python:dict`]
+           A list of dictionaries containing suggestions for the patch.
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
