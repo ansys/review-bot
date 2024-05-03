@@ -36,12 +36,12 @@ dependencies = [
 
 [project.optional-dependencies]
 tests = [
-    "pytest==8.1.1",
+    "pytest==8.2.0",
     "pytest-cov==5.0.0",
     "pytest-retry==1.6.2",
     "requests==2.31.0",
-    "openai==1.21.2",
-    "jsonschema==4.21.1",
+    "openai==1.25.1",
+    "jsonschema==4.22.0",
     "gitpython==3.1.43",
 ]
 doc = [
