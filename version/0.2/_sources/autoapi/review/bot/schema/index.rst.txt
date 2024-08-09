@@ -1,0 +1,38 @@
+:py:mod:`review.bot.schema`
+===========================
+
+.. py:module:: review.bot.schema
+
+.. autoapi-nested-parse::
+
+   
+   Module for managing JSON resources.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   schema/index.rst
+
+
