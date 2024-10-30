@@ -1,0 +1,90 @@
+review.bot.gh_interface
+=======================
+
+.. py:module:: review.bot.gh_interface
+
+.. autoapi-nested-parse::
+
+   Contains functions to interface with GitHub.
+
+   ..
+       !! processed by numpydoc !!
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   review.bot.gh_interface.LOG
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   review.bot.gh_interface.get_changed_files_and_contents
+
+
+Module Contents
+---------------
+
+.. py:data:: LOG
+
+.. py:function:: get_changed_files_and_contents(owner, repo, pull_number, gh_access_token=None)
+
+   
+   Retrieve the filenames, status, and contents of files changed in a GitHub PR.
+
+
+   :Parameters:
+
+       **owner** : :class:`python:str`
+           The owner of the repository where the pull request was made.
+
+       **repo** : :class:`python:str`
+           The name of the repository where the pull request was made.
+
+       **pull_number** : :class:`python:int`
+           The number of the pull request to retrieve the changed files for.
+
+       **gh_access_token** : :class:`python:str`, :obj:`optional`
+           GitHub token needed to communicate with the repository. By default, ``None``,
+           which means it will try to read an existing env variable named ``GITHUB_TOKEN``.
+
+
+
+   :Returns:
+
+       :class:`python:list`\[:class:`python:dict`]
+           A list of dictionaries, where each dictionary represents a file that
+           was changed in the pull request. The dictionary contains the following
+           keys:
+           
+           - filename: str, the name of the file
+           - status: str, the status of the file change ('added', 'modified', or 'removed')
+           - file_text: str, the contents of the file as a string
+
+
+
+
+   :Raises:
+
+       :obj:`RuntimeError`
+           If an error occurs while fetching the file content.
+
+
+
+
+   .. rubric:: Notes
+
+   This function uses the GitHub API to retrieve the list of changed files in
+   a pull request, along with the contents of each changed file. It requires a
+   GitHub access token with appropriate permissions to access the repository.
+
+
+
+   ..
+       !! processed by numpydoc !!
+
