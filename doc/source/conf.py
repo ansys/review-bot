@@ -106,3 +106,7 @@ autoapi_options = [
 autoapi_template_dir = "_autoapi_templates"
 exclude_patterns = ["_autoapi_templates/index.rst"]
 autoapi_python_use_implicit_namespaces = True
+
+linkcheck_ignore = [
+    "https://opensource.org/licenses/MIT",
+]
