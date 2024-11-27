@@ -1,0 +1,16 @@
+diff --git a/mesh/OccDataStructureBase.cpp b/mesh/OccDataStructureBase.cpp
+index 32a710b..48c5fdb 100644
+--- a/mesh/OccDataStructureBase.cpp
++++ b/mesh/OccDataStructureBase.cpp
+@@ -289,9 +289,9 @@ void OccDataStructureBase::setOriginalFileName(const std::string &fileName)
+ 
+ std::string OccDataStructureBase::getAbsoluteDebugOutputPath()
+ {
+-    std::filesystem::path p = std::filesystem::path(getOriginalFileName());
++    std::filesystem::path p2 = std::filesystem::current_path();
+ 
+-    auto absPath = std::filesystem::path(getOriginalFileName()).parent_path().generic_string();
++    auto absPath = p2.generic_string();
+ 
+     return absPath;
+ }
