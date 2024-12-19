@@ -1,0 +1,75 @@
+diff --git a/mesh/Cm2ConstructionTet3D.cpp b/mesh/Cm2ConstructionTet3D.cpp
+index 1580e15..8aad957 100644
+--- a/mesh/Cm2ConstructionTet3D.cpp
++++ b/mesh/Cm2ConstructionTet3D.cpp
+@@ -7,6 +7,8 @@
+ #include "Cm2ConstructionTet3D.h"
+ #include "DistanceTetMeshToCad.h"
+ 
++#include "PrimeFileIO.h"
++
+ #include "OccFileReader.h"
+ #include "OccFileWriter.h"
+ 
+@@ -262,7 +264,7 @@ void Cm2ConstructionTet3D::generateTetMesh(cm2::intersect_t3::mesher::data_type
+             dataAll.colors = secondAll.colors;
+         }
+     }
+-    m_iNumberOfRemesherIterations = iCount -1;
++    m_iNumberOfRemesherIterations = iCount - 1;
+     m_occData->addMsg("Number of remeshing iterations: " + std::to_string(m_iNumberOfRemesherIterations));
+ 
+     if (m_bRemesherFailed)
+@@ -294,6 +296,12 @@ void Cm2ConstructionTet3D::generateTetMesh(cm2::intersect_t3::mesher::data_type
+         return;
+     }
+ 
++    if (m_occData->isAddDebugInfoFlag() >= 5)
++    {
++        PrimeFileIO fileio(this);
++        fileio.writeBoundaryMesh(secondAll);
++    }
++
+     // tetra meshing
+     if (!createTetMesh(secondAll))
+         return;
+@@ -312,6 +320,7 @@ void Cm2ConstructionTet3D::generateTetMesh(cm2::intersect_t3::mesher::data_type
+ 
+     m_cellColors = m_tetData.colors;
+     m_connectM = m_tetData.connectM;
++    m_connectB = m_tetData.connectB;
+     m_pos = m_tetData.pos;
+     m_shape_qualities = m_tetData.shape_qualities;
+ 
+@@ -326,6 +335,7 @@ void Cm2ConstructionTet3D::generateTetMesh(cm2::intersect_t3::mesher::data_type
+     Standard_Real rVolDiff2 = std::fabs(rVolTest3 - rVolTest2);
+ 
+     meshInfo.dMeshingDuration = m_tetData.total_time;
++    meshInfo.dPrimeFileIODuration = m_dPrimeFileIODuration;
+     m_meshInfo.dOccGeometryVolume = rVolTest3;
+     m_meshInfo.dSurfaceArea = m_dSurfaceArea;
+     m_meshInfo.dTetVolume = rVolTest2;
+@@ -348,18 +358,17 @@ void Cm2ConstructionTet3D::generateTetMesh(cm2::intersect_t3::mesher::data_type
+     meshInfo.dJacobianMin = dMinJacobian;
+     meshInfo.dJacobianMax = dMaxJacobian;
+ 
+-    const cm2::misc::histogram &histo_Qs = m_tetData.histo_Qs;
+-    meshInfo.dAverageCellQuality = histo_Qs.mean_value();
+-    meshInfo.dWorstCellQuality = histo_Qs.min_value();
++    meshInfo.dAverageCellQuality = getAverageCellQuality();
++    meshInfo.dWorstCellQuality = getWorstCellQuality();
+ 
+-    size_t numberOfBins = histo_Qs.bins();
+-    const cm2::DoubleVec &bin_boundaries = histo_Qs.bin_boundaries();
++    size_t numberOfBins = m_tetData.histo_Qs.bins();
++    const cm2::DoubleVec &bin_boundaries = m_tetData.histo_Qs.bin_boundaries();
+ 
+     for (size_t i = 0; i < numberOfBins; ++i)
+     {
+         const double lower = bin_boundaries.at(i);
+         const double upper = bin_boundaries.at(i + 1);
+-        const unsigned int hits = histo_Qs.hits(i);
++        const unsigned int hits = m_tetData.histo_Qs.hits(i);
+         meshInfo.cellQualities.push_back(std::make_tuple(lower, upper, hits));
+     }
+ 
