@@ -1,0 +1,79 @@
+:py:mod:`review.bot.exceptions`
+===============================
+
+.. py:module:: review.bot.exceptions
+
+.. autoapi-nested-parse::
+
+   Module for exceptions.
+
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+.. py:exception:: ValidationErrorException(message: str = 'Output message from LLM is not properly formed.', llm_output: str = None)
+
+
+   Bases: :py:obj:`Exception`
+
+   
+   Exception class for LLM format errors.
+
+
+   :Parameters:
+
+       **message** : :class:`python:str`, :obj:`optional`
+           Message to be raised, by default "Output message from LLM is not properly formed.".
+
+       **llm_output** : :class:`python:str`, :obj:`optional`
+           Raw output from the LLM, by default ``None``.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:exception:: EmptyOpenAIResponseException(message: str = 'The response from OpenAI is empty.')
+
+
+   Bases: :py:obj:`Exception`
+
+   
+   Exception class for OpenAI empty responses.
+
+
+   :Parameters:
+
+       **message** : :class:`python:str`, :obj:`optional`
+           Message to be raised, by default "The response from OpenAI is empty.".
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

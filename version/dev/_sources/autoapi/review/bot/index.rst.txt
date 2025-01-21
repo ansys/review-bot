@@ -1,0 +1,58 @@
+review.bot
+==========
+
+.. py:module:: review.bot
+
+.. autoapi-nested-parse::
+
+   
+   OpenAI LLM powered Review-bot.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/review/bot/cli/index
+   /autoapi/review/bot/defaults/index
+   /autoapi/review/bot/exceptions/index
+   /autoapi/review/bot/gh_interface/index
+   /autoapi/review/bot/git_interface/index
+   /autoapi/review/bot/misc/index
+   /autoapi/review/bot/open_ai_interface/index
+   /autoapi/review/bot/schema/index
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   review.bot.__version__
+
+
+Package Contents
+----------------
+
+.. py:data:: __version__
+
