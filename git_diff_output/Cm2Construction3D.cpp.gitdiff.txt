@@ -1,0 +1,27 @@
+diff --git a/mesh/Cm2Construction3D.cpp b/mesh/Cm2Construction3D.cpp
+index e7e347a..bb59f67 100644
+--- a/mesh/Cm2Construction3D.cpp
++++ b/mesh/Cm2Construction3D.cpp
+@@ -154,6 +154,13 @@ bool Cm2Construction3D::build()
+         {
+             iNumberOfMesherRestart++;
+ 
++            //[TODO] remove following msg stmts
++            m_occData->addMsg("Remesher Error Code:    " + std::to_string(m_iRemesherErrorCode));
++            m_occData->addMsg("Tetmesher Error Code:   " + std::to_string(m_iTetmesherErrorCode));
++            m_occData->addMsg("Tetmesher Warning Code: " + std::to_string(m_iTetmesherWarningCode));
++            m_occData->addMsg("Number of Tets:         " + std::to_string(numberOfElements()));
++            m_occData->addMsg("PartIDs with No Elements: " + std::to_string(m_meshInfo.partListWithNoElements.size()));
++
+             // CM2_BOUNDARY_WARNING = -15
+             // CM2_FACE_DISCARDED   = -14
+             // CM2_NODE_DISCARDED   = -12
+@@ -169,7 +176,7 @@ bool Cm2Construction3D::build()
+                 (m_iTetmesherWarningCode == cm2::tetramesh_iso::mesher::data_type::CM2_FACE_DISCARDED &&
+                  m_meshInfo.partListWithNoElements.size() != 0) ||
+                 (m_iTetmesherWarningCode == cm2::tetramesh_iso::mesher::data_type::CM2_NODE_DISCARDED &&
+-                 m_meshInfo.partListWithNoElements.size() != 0) )
++                 m_meshInfo.partListWithNoElements.size() != 0))
+             {
+                 // We are in a situation, where the default fix intersection tolerance doesn't work.
+                 // So, we try to use a smaller fix intersection tolerance and restart the meshing process.

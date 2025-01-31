@@ -1,0 +1,26 @@
+diff --git a/mesh/OccDataStructure.cpp b/mesh/OccDataStructure.cpp
+index bb35688..71bde7c 100644
+--- a/mesh/OccDataStructure.cpp
++++ b/mesh/OccDataStructure.cpp
+@@ -684,12 +684,20 @@ bool OccDataStructure::getPointOnFace(const TopoDS_Face &faceShape, double &fX,
+ 
+     Handle(Geom_Surface) aSurface = BRep_Tool::Surface(faceShape);
+ 
++    BRepAdaptor_Surface Adaptor;
++    Adaptor.Initialize(faceShape);
++    GeomAbs_SurfaceType surfaceType = Adaptor.GetType();
++
+     GeomAPI_ProjectPointOnSurf proj;
+     try
+     {
+         OCC_CATCH_SIGNALS
+ 
+-        proj.Init(point, aSurface);
++        // due to a segmentation fault in OCCT, we use the Extrema_ExtAlgo_Tree instead of the default
++        if (surfaceType == GeomAbs_OffsetSurface)
++            proj.Init(point, aSurface, Extrema_ExtAlgo_Tree);
++        else
++            proj.Init(point, aSurface);
+     }
+     catch (...)
+     {
