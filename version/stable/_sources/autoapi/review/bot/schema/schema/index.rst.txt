@@ -1,0 +1,61 @@
+:py:mod:`review.bot.schema.schema`
+==================================
+
+.. py:module:: review.bot.schema.schema
+
+.. autoapi-nested-parse::
+
+   Module for JSON validation purposes.
+
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   review.bot.schema.schema.validate_output
+
+
+
+.. py:function:: validate_output(output: List, schema_path: str = None)
+
+   
+   Validate the output from the LLM with the given schema.
+
+
+   :Parameters:
+
+       **output** : :class:`python:list`
+           Formatted output from LLM results.
+
+       **schema_path** : :class:`python:str`, optional.
+           JSON schema file path to validate against. By default, ``None``,
+           which falls back to the implemented schema inside the package.
+
+   :Returns:
+
+       :ref:`bool <python:bltin-boolean-values>`
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
