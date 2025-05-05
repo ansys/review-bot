@@ -1,0 +1,15 @@
+diff --git a/mesh/Cm2ConstructionTet3D.h b/mesh/Cm2ConstructionTet3D.h
+index 1b0a890..c5e9ae7 100644
+--- a/mesh/Cm2ConstructionTet3D.h
++++ b/mesh/Cm2ConstructionTet3D.h
+@@ -54,6 +54,9 @@ class Cm2ConstructionTet3D : public Cm2Construction3D
+     void checkMeshToCadFit();
+ 
+     void cellCenter(int iE, double &dX, double &dY, double &dZ) override;
++
++    virtual double getAverageCellQuality() { return m_tetData.histo_Qs.mean_value(); }
++    virtual double getWorstCellQuality() { return m_tetData.histo_Qs.min_value(); }
+ };
+ 
+ #endif
+\ No newline at end of file
