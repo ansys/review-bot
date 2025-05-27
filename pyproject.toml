@@ -40,7 +40,7 @@ tests = [
     "pytest-retry==1.7.0",
     "requests==2.32.3",
     "openai==1.82.0",
-    "jsonschema==4.23.0",
+    "jsonschema==4.24.0",
     "gitpython==3.1.44",
 ]
 doc = [
