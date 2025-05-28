@@ -44,7 +44,7 @@ tests = [
     "gitpython==3.1.44",
 ]
 doc = [
-    "ansys_sphinx_theme[autoapi]==1.4.5",
+    "ansys_sphinx_theme[autoapi]==1.5.0",
     "numpydoc==1.8.0",
     "Sphinx==8.2.3",
     "Sphinx-copybutton==0.5.2",
