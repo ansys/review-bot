@@ -1,0 +1,9 @@
+API reference
+=============
+
+This page contains the ``review-bot`` API reference.
+
+.. toctree::
+   :titlesonly:
+
+   /autoapi/review/bot/index

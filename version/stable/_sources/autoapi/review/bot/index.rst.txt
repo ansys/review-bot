@@ -1,0 +1,60 @@
+:py:mod:`review.bot`
+====================
+
+.. py:module:: review.bot
+
+.. autoapi-nested-parse::
+
+   
+   OpenAI LLM powered Review-bot.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   cli/index.rst
+   schema/index.rst
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   defaults/index.rst
+   exceptions/index.rst
+   gh_interface/index.rst
+   git_interface/index.rst
+   misc/index.rst
+   open_ai_interface/index.rst
+
+
+Package Contents
+----------------
+
+.. py:data:: __version__
+
+   
+

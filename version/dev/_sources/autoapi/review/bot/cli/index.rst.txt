@@ -1,0 +1,38 @@
+review.bot.cli
+==============
+
+.. py:module:: review.bot.cli
+
+.. autoapi-nested-parse::
+
+   
+   Module for CLI interface.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/review/bot/cli/cli/index
+
+

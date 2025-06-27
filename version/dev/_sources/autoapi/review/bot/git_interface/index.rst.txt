@@ -1,0 +1,173 @@
+review.bot.git_interface
+========================
+
+.. py:module:: review.bot.git_interface
+
+.. autoapi-nested-parse::
+
+   Interface module for local GIT files.
+
+   ..
+       !! processed by numpydoc !!
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   review.bot.git_interface.LOG
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   review.bot.git_interface.LocalGit
+
+
+Module Contents
+---------------
+
+.. py:data:: LOG
+
+.. py:class:: LocalGit(repo_path: str)
+
+   
+   Class to extract information from a diff in a local repository.
+
+
+   :Parameters:
+
+       **repo_path** : :class:`python:str`
+           Path to the local repository.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. py:method:: get_filenames()
+
+      
+      Get the filenames of the diff files.
+
+
+
+
+
+      :Returns:
+
+          :class:`python:list`
+              List with the filenames.
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: get_local_patch()
+
+      
+      Process the raw diff to extract the filename and useful info.
+
+
+
+
+
+      :Returns:
+
+          :obj:`Dict`
+              Dict with the file name as key and the diff as content.
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: change_branch(branch_name: str)
+
+      
+      Switch the branch of the repo to the required one.
+
+
+      :Parameters:
+
+          **branch_name** : :class:`python:str`
+              Branch to switch to.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: get_file_sources()
+
+      
+      Get the text from the code files of the diff.
+
+
+
+
+
+      :Returns:
+
+          :obj:`Dict`
+              Dict with the file name as key and the source file as content.
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

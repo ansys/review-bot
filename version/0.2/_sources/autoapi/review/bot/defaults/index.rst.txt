@@ -1,0 +1,142 @@
+:py:mod:`review.bot.defaults`
+=============================
+
+.. py:module:: review.bot.defaults
+
+.. autoapi-nested-parse::
+
+   Default variables for the project.
+
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+.. py:data:: ACCESS_TOKEN
+
+   
+   Default OpenAI token to use.
+
+   Get the OpenAI token from the environment variables.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:data:: API_BASE
+
+   
+   Default URL for OpenAI Azure API.
+
+   Get the URL of the OpenAI Azure service from the
+   environment variables.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:data:: API_TYPE
+
+   
+   Default OpenAI API type.
+
+   Get the type of OpenAI API we are using from the
+   environment variables.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:data:: API_MODEL
+
+   
+   Default OpenAI Model to use.
+
+   Get the type of OpenAI model we are using from the
+   environment variables. In Azure dependes on the
+   service you have available.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:data:: API_VERSION
+
+   
+   Default OpenAI API Azure version we are using.
+
+   Get the OpenAI API Azure version from the environment variables.
+   You can check available versions in this link:
+   https://learn.microsoft.com/en-us/azure/cognitive-services/openai/reference#rest-api-versioning
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

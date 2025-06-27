@@ -1,0 +1,277 @@
+:py:mod:`review.bot.misc`
+=========================
+
+.. py:module:: review.bot.misc
+
+.. autoapi-nested-parse::
+
+   Miscellaneous functions.
+
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   review.bot.misc.get_client
+   review.bot.misc.open_logger
+   review.bot.misc.add_line_numbers
+   review.bot.misc.clean_string
+   review.bot.misc.clean_content
+   review.bot.misc.parse_suggestions
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   review.bot.misc.LOG
+
+
+.. py:data:: LOG
+
+   
+
+.. py:function:: get_client(config_file: str = None) -> Union[openai.OpenAI, openai.AzureOpenAI]
+
+   
+   Get the OpenAI client with the configuration file initialization.
+
+
+   :Parameters:
+
+       **config_file** : :class:`python:str`, :obj:`optional`
+           Initialization parameters of the client, by default None.
+
+   :Returns:
+
+       :obj:`Union`\[:obj:`OpenAI`, :obj:`AzureOpenAI`]
+           Initialized OpenAI client.
+
+
+
+
+   :Raises:
+
+       :obj:`OSError`
+           Thrown if access token is missing.
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: open_logger(loglevel='DEBUG', formatstr='%(name)-20s - %(levelname)-8s - %(message)s')
+
+   
+   Start logging to standard output.
+
+
+   :Parameters:
+
+       **loglevel** : :class:`python:str`, :obj:`optional`
+           Standard logging level. One of the following:
+           
+           - ``"DEBUG"`` (default)
+           - ``"INFO"``
+           - ``"WARNING"``
+           - ``"ERROR"``
+           - ``"CRITICAL"``
+
+       **formatstr** : :class:`python:str`, :obj:`optional`
+           Format string.  See :class:`logging.Formatter`.
+
+   :Returns:
+
+       :obj:`logging.RootLogger`
+           Root logging object.
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   Output logging to stdout at the ``'INFO'`` level.
+
+   >>> import review.bot as review_bot
+   >>> review_bot.open_logger('INFO')
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: add_line_numbers(patch)
+
+   
+   Add line numbers to the added lines in a given patch string.
+
+   The function takes a patch string and adds line numbers to the lines that
+   start with a '+'. It returns a new patch string with added line numbers.
+   Line numbers are added immediately to the left of any '+'.
+
+   :Parameters:
+
+       **patch** : :class:`python:str`
+           The patch string containing the changes in the file.
+
+   :Returns:
+
+       :class:`python:str`
+           The modified patch string with line numbers added to the added lines.
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   >>> patch = '''@@ -1,3 +1,5 @@
+   ... +from itertools import permutations
+   ... +
+   ... import numpy as np
+   ... import pytest'''
+   >>> add_line_numbers(patch)
+   '@@ -1,3 +1,5 @@
+   1   +from itertools import permutations
+   ... +
+   ... import numpy as np
+   ... import pytest'
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: clean_string(input_text: str)
+
+   
+   Clean ``type`` and ``lines`` strings.
+
+   Clean `type` and `lines` strings in the LLM output, in
+   case some unwanted characters are mixed with the desired
+   content.
+
+   :Parameters:
+
+       **input_text** : :class:`python:str`
+           Raw text from the LLM.
+
+   :Returns:
+
+       :class:`python:str`
+           Cleaned text.
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: clean_content(raw_content: List, text_block=None)
+
+   
+   Join the list of the content.
+
+   Join the list of the content, that might be split
+   due to preprocessing, and cleans starting commas if they appear.
+
+   :Parameters:
+
+       **raw_content** : :class:`python:list`
+           List with the content of the suggestion.
+
+   :Returns:
+
+       :class:`python:str`
+           Content processed.
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: parse_suggestions(text_block: str)
+
+   
+   Parse a given text block containing suggestions.
+
+   Returns a list of dictionaries with keys: filename, lines, type, and text.
+
+   :Parameters:
+
+       **text_block** : :class:`python:str`
+           The text block containing suggestions.
+
+   :Returns:
+
+       :class:`python:list` :obj:`of` :class:`python:dict`
+           A list of dictionaries containing information about each suggestion.
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   >>> tblock = '''
+   ... [tests/test_geometric_objects.py], [259-260], [SUGGESTION]: Replace `Rectangle` with `Quadrilateral` for clarity and consistency with the name of the class being tested.
+   ... '''
+   >>> parse_suggestions(tblock)
+   [{'filename': 'tests/test_geometric_objects.py', 'lines': '259-260', 'type': 'SUGGESTION', 'text': 'Replace `Rectangle` with `Quadrilateral` for clarity and consistency with the name of the class being tested.'}]
+
+
+
+   ..
+       !! processed by numpydoc !!
+

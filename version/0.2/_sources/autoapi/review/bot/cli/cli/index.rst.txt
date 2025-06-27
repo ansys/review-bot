@@ -1,0 +1,77 @@
+:py:mod:`review.bot.cli.cli`
+============================
+
+.. py:module:: review.bot.cli.cli
+
+.. autoapi-nested-parse::
+
+   Module for CLI related code.
+
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   review.bot.cli.cli.show_review
+   review.bot.cli.cli.main
+
+
+
+.. py:function:: show_review(args)
+
+   
+   Show through command line the review of the diff from the LLM.
+
+
+   :Parameters:
+
+       **args**
+           Args from the command line.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: main()
+
+   
+   Entrypoint to execute.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
