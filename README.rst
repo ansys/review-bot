@@ -27,6 +27,10 @@ Review Bot
    :target: https://github.com/psf/black
    :alt: Black
 
+.. warning::
+
+   The following repository has been archived and is no longer in use.
+
 Overview
 --------
 
