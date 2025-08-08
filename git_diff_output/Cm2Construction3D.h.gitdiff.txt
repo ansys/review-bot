@@ -1,0 +1,13 @@
+diff --git a/mesh/Cm2Construction3D.h b/mesh/Cm2Construction3D.h
+index f8f56ad..ce2ba7a 100644
+--- a/mesh/Cm2Construction3D.h
++++ b/mesh/Cm2Construction3D.h
+@@ -125,6 +125,8 @@ class Cm2Construction3D : public Cgal3DPolyhedronConstruction
+     double m_dBondingDurationUntilNow = 0;
+     bool m_bModelTooComplexForBonding = false;
+ 
++    double m_dPrimeFileIODuration = 0;
++
+     cm2::element_type m_feType; // CM2_TETRA4 or CM2_HEXA8
+ 
+     cm2::DoubleMat m_pos;                 // mesh coordinates

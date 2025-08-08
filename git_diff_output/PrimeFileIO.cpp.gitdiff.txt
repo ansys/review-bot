@@ -1,0 +1,1054 @@
+diff --git a/mesh/PrimeFileIO.cpp b/mesh/PrimeFileIO.cpp
+new file mode 100644
+index 0000000..95d076c
+--- /dev/null
++++ b/mesh/PrimeFileIO.cpp
+@@ -0,0 +1,1047 @@
++#include "PrimeFileIO.h"
++#include <filesystem>
++#include <string>
++
++//#define EOF -1
++#define MAX_NAME_LENGTH 1024
++#if USE_INT64
++#if _NT
++#define PRIME_ELM_TYPE long long
++#else
++#define PRIME_ELM_TYPE long
++#endif
++#else
++#define PRIME_ELM_TYPE int
++#endif
++
++/* RCELL=3 then LCELL=4
++
++            |
++            |
++            *1
++           /|  \
++          / |    \
++            |      \
++         /  |3       \ 0
++            *---------*---
++        /  /     _-
++          /   _-
++       / /  -
++       *2
++
++    CM2_TETRA4
++
++    F0 = {1 2 3}
++    F1 = {2 0 3}
++    F2 = {1 3 0}
++    F3 = {2 1 0}
++
++*/
++#define RCELL 3
++#define LCELL 4
++
++#define NULLP(p) ((p) == NULL)
++
++PrimeFileIO::PrimeFileIO(Cm2Construction3D *meshConstruction)
++    : m_meshConstruction(meshConstruction)
++{
++    // init to zero
++    m_numberOfNodes = 0;
++    m_numberOfEdges = 0;
++    m_numberOfCells = 0;
++    m_numberOfFaces = 0;
++}
++
++void PrimeFileIO::writeBoundaryMesh(const cm2::intersect_t3::mesher::data_type &dataAllRemeshed)
++{
++    /*std::string unique_name = m_meshConstruction->occData()->getOriginalFileBaseName()
++                            + "_" + std::to_string(m_meshConstruction->uniqueBaseIdentifier());*/
++
++    /*Name the boundaryMeshFile & volumeMeshFile */
++    std::string path = m_meshConstruction->occData()->getDebugOutputPath(); // /local/data/singleBox_/mesh1
++    m_boundaryMeshFileName = "boundaryMesh_" + std::to_string(m_meshConstruction->uniqueBaseIdentifier()) + "_toPrime" + ".cas";
++
++    FILE *fw = fopen((primeFolderPath() + "/" + m_boundaryMeshFileName).c_str(), "w");
++    WritePrimeData(fw, dataAllRemeshed);
++
++    int checkBoundaryFile = access((primeFolderPath() + "/" + m_boundaryMeshFileName).c_str(), F_OK);
++    if (checkBoundaryFile == -1)
++    {
++        m_meshConstruction->occData()->addMsg("The Boundary Mesh Prime File do not exists", CADErrorHandler::TetMeshDidNotWork);
++    }
++}
++
++int PrimeFileIO::ReadVolumeMesh(cm2::tetramesh_iso::mesher::data_type &tetData, std::shared_ptr<OccDataStructure> m_occData,
++                                bool &foundDiscardedFaces)
++{
++    std::string path = m_meshConstruction->occData()->getDebugOutputPath();
++    m_volumeMeshFileName = "volumeMesh_" + std::to_string(m_meshConstruction->uniqueBaseIdentifier()) + "_fromPrime.pmdat";
++
++    FILE *fVol = fopen((primeFolderPath() + "/" + m_volumeMeshFileName).c_str(), "r");
++    int checkVolumeFile = access((primeFolderPath() + "/" + m_volumeMeshFileName).c_str(), F_OK);
++    if (checkVolumeFile == -1)
++    {
++        m_meshConstruction->occData()->addMsg("The Volume Mesh Prime File do not exists", CADErrorHandler::TetMeshDidNotWork);
++        return 0;
++    }
++    ReadPrimeData(fVol, tetData, m_occData, foundDiscardedFaces);
++
++    if (m_occData->isAddDebugInfoFlag() >= 5)
++    {
++        /*Debug file to view the connectB matrix*/
++        std::string debug_file = primeFolderPath() + "/remesherData_" + std::to_string(m_meshConstruction->uniqueBaseIdentifier()) + ".dat";
++        debug_file = m_occData->getDebugOutputPath() + "/afterConnectBFilled.debugFile." + ".dat";
++        tetData.save(debug_file.c_str());
++    }
++
++    return 1;
++}
++
++void PrimeFileIO::RunPrimeShellScript(std::shared_ptr<OccDataStructure> m_occData)
++{
++    std::string command_name = "sh prime/runPrimeImage_" + std::to_string(m_meshConstruction->uniqueBaseIdentifier()) + ".sh";
++    int returnValue = std::system(command_name.c_str());
++    if (m_occData->isAddDebugInfoFlag() >= 5)
++        m_occData->addMsg("########################################## The prime mesher returned status: " + std::to_string(returnValue));
++}
++
++std::string PrimeFileIO::primeFolderPath()
++{
++    // here you can add the "prime" subfolder logic,
++    // and when you call this function in all places where you require the "path" in which the prime files are stored,
++    // then we can easy change this path to whatever we like and it will still work.
++    /*create a prime directory to store all the debug file in it*/
++    int ret_d = CreateDirectory("prime");
++    if (ret_d)
++        std::cout << "########################################## the prime debug directory has been successfully created -> " << std::endl;
++
++    CreateDirectory("prime");
++
++    std::string prime_path = m_meshConstruction->occData()->getDebugOutputPath() + "/prime";
++
++    return prime_path;
++}
++
++std::string PrimeFileIO::dockerWorkDir()
++{
++    if (const char *used_dood_env = std::getenv("USE_DOOD")) // Docker outside of Docker
++    {
++        bool bUseDood;
++        std::stringstream ss(used_dood_env);
++        ss >> std::boolalpha >> bUseDood;
++        if (bUseDood)
++            return m_meshConstruction->occData()->getAbsoluteDebugOutputPath() + "/prime";
++    }
++
++    return "/local/workdir";
++}
++
++bool PrimeFileIO::isDOOD()
++{
++    // returns true when we are running a Docker outside docker environment
++    bool bUseDood = false;
++    if (const char *used_dood_env = std::getenv("USE_DOOD")) // Docker outside of Docker
++    {
++
++        std::stringstream ss(used_dood_env);
++        ss >> std::boolalpha >> bUseDood;
++    }
++
++    return bUseDood;
++}
++
++bool PrimeFileIO::CreateDirectory(const std::string &dirName)
++{
++    std::error_code err;
++    if (!std::filesystem::create_directories(dirName, err))
++    {
++        if (std::filesystem::exists(dirName))
++        {
++            return true; // the folder probably already existed
++        }
++
++        std::cout << "createDirectory: failed to create [" << dirName.c_str() << "], err:" << err.message().c_str() << std::endl;
++        return false;
++    }
++
++    return true;
++}
++
++/*FlushString*/
++void PrimeFileIO::FlushString(FILE *f)
++{
++    int i;
++    /*TGEnv env = m_model->GetTGEnv();*/
++
++    while ((i = getc(f)) != EOF)
++    {
++        if ((char)i == '"')
++            return;
++        else if ((char)i == '\\')
++            if (getc(f) == EOF)
++                break;
++    }
++
++    return;
++}
++
++/*ReadStringLarge*/
++char *PrimeFileIO::ReadStringLarge(FILE *f, char *token, int *max_len)
++{
++    /*TGEnv env = m_model->GetTGEnv();*/
++    int curr_len = 0;
++    int i;
++
++    while ((i = getc(f)) != EOF)
++    {
++        if (!NULLP(max_len) && (curr_len == *max_len))
++        {
++            *max_len = 2 * (*max_len);
++            token = (char *)malloc((*max_len) * sizeof(char));
++        }
++        if ((char)i == '"')
++        {
++            token[curr_len] = '\0';
++            return token;
++        }
++        if ((char)i == '\\' && getc(f) == EOF)
++        {
++            break;
++        }
++        token[curr_len] = (char)i;
++        curr_len++;
++    }
++    // how to error out things
++    // EOF_Error(env);
++    return token;
++}
++
++/*ReadString*/
++void PrimeFileIO::ReadString(FILE *f, char *token)
++{
++    /*TGEnv env = m_model->GetTGEnv();*/
++    int i;
++
++    while ((i = getc(f)) != EOF)
++    {
++        if ((char)i == '"')
++        {
++            *token = '\0';
++            return;
++        }
++        if ((char)i == '\\' && getc(f) == EOF)
++        {
++            break;
++        }
++        *token = (char)i;
++        token++;
++    }
++    // EOF_Error(env);
++    return;
++}
++
++/*ReadToken*/
++void PrimeFileIO::ReadToken(FILE *f, char *token)
++{
++    int i;
++    while ((i = getc(f)) != EOF)
++    {
++        switch ((char)i)
++        {
++        case '(':
++        case ')':
++            *token = '\0';
++            ungetc((char)i, f);
++            return;
++        case ' ':
++            *token = '\0';
++            return;
++        default:
++            *token = (char)i;
++            token++;
++            break;
++        }
++    }
++    return;
++}
++
++/*ReadNextToken*/
++char *PrimeFileIO::ReadNextToken(FILE *f, char *token, int *max_len)
++{
++    int i;
++    // Assert(m_model->GetTGEnv(), NULLP(max_len) || (*max_len) > 0);
++    while ((i = getc(f)) != EOF)
++    {
++        switch ((char)i)
++        {
++        case ' ':
++            break;
++        case '(':
++        case ')':
++            token[0] = (char)i;
++            token[1] = '\0';
++            return token;
++        case EOF:
++            token[0] = '\0';
++            return token;
++        case '.':
++            break;
++        case '\'':
++            break;
++        case '"':
++            if (!NULLP(max_len) && *max_len > 0)
++            {
++                return ReadStringLarge(f, token, max_len);
++            }
++            else
++            {
++                ReadString(f, token);
++                return token;
++            }
++        default:
++            if (isprint((char)i))
++            {
++                token[0] = (char)i;
++                ReadToken(f, token + 1);
++                return token;
++            }
++        }
++    }
++    return token;
++    /* not reached */
++}
++
++bool PrimeFileIO::CheckNextChar(FILE *f, char c)
++{
++    int i;
++    while ((i = getc(f)) != EOF)
++    {
++        if ((char)i == ' ' || (char)i == '.' || (char)i == '\n')
++            continue;
++        ungetc((char)i, f);
++        return ((char)i == c);
++    }
++    return false;
++}
++
++bool PrimeFileIO::IsNextTokenString(FILE *f) { return CheckNextChar(f, '"'); }
++
++bool PrimeFileIO::IsNextTokenListEnd(FILE *f) { return CheckNextChar(f, ')'); }
++
++void PrimeFileIO::ReadNextToken(FILE *f, char *token) { ReadNextToken(f, token, NULL); }
++
++void PrimeFileIO::NreadNextToken(FILE *f, char *token, int n)
++{
++    for (int i = 0; i < n; i++)
++    {
++        ReadNextToken(f, token);
++    }
++}
++
++char *PrimeFileIO::ReadNextTokenLarge(FILE *f, char *token, int *max_len) { return ReadNextToken(f, token, max_len); }
++
++/* move file pointer just past next opening paren */
++void PrimeFileIO::ReadStartList(FILE *f, char *token)
++{
++    ReadNextToken(f, token);
++
++    if (token[0] == '(')
++        return;
++    // else if (token[0] == EOF)
++    // EOF_Error(env);    //error out things in onscale way
++    // else
++    // Error(env, "unexpected character read.\n");
++}
++
++/* move file pointer just past closing paren of current list */
++void PrimeFileIO::FlushReadList(FILE *f)
++{
++    // TGEnv env = m_model->GetTGEnv();
++    int i;
++
++    while ((i = getc(f)) != EOF)
++    {
++        if ((char)i == ')')
++            return;
++        else if ((char)i == '(')
++            FlushReadList(f);
++        else if ((char)i == '"')
++            FlushString(f);
++    }
++    // EOF_Error(env);
++    return;
++}
++
++void PrimeFileIO::Cdr(FILE *f, char *token)
++{
++    ReadNextToken(f, token);
++    if (token[0] == '(')
++    {
++        FlushReadList(f);
++    }
++    return;
++}
++
++/* f format is 1 2 3 4)*/
++void PrimeFileIO::ReadOpenedList(FILE *f, char *token, std::vector<int> &list)
++{
++    ReadNextToken(f, token);
++    while (token[0] != ')')
++    {
++        list.push_back(atoi(token));
++        ReadNextToken(f, token);
++    }
++
++    return;
++}
++
++/* f format is str1 str2 str3)*/
++void PrimeFileIO::ReadOpenedList(FILE *f, char *token, std::vector<std::string> &list)
++{
++    ReadNextToken(f, token);
++    while (token[0] != ')')
++    {
++        list.push_back(std::string(token));
++        ReadNextToken(f, token);
++    }
++
++    return;
++}
++
++/* f format is 1.0 2.0 0.3 0.4)*/
++void PrimeFileIO::ReadOpenedList(FILE *f, char *token, std::vector<double> &list)
++{
++    ReadNextToken(f, token);
++    while (token[0] != ')')
++    {
++        list.push_back((double)atof(token));
++        ReadNextToken(f, token);
++    }
++
++    return;
++}
++
++double PrimeFileIO::ReadDouble(FILE *f)
++{
++    // TGEnv env = m_model->GetTGEnv();
++
++    double val = 0;
++    // Prime_Protect_Read_Double(env, f, &val);
++    return val;
++}
++
++int PrimeFileIO::ReadInt(FILE *f)
++{
++    // TGEnv env = m_model->GetTGEnv();
++
++    int val = 0;
++    // Prime_Protect_Read_Dint(env, f, &val);
++    return val;
++}
++
++bool PrimeFileIO::ReadNextTokenAndCheckStartList(FILE *f, char *token)
++{
++    ReadNextToken(f, token);
++    if (token[0] == '(')
++    {
++        return true;
++    }
++    return false;
++}
++
++/* f format is (1 2 3 4)*/
++void PrimeFileIO::ReadList(FILE *f, char *token, std::vector<int> &list)
++{
++    if (!ReadNextTokenAndCheckStartList(f, token))
++        return;
++    ReadOpenedList(f, token, list);
++}
++
++/* f format is (1 2 3 4)*/
++void PrimeFileIO::ReadList(FILE *f, char *token, std::vector<std::string> &list)
++{
++    if (!ReadNextTokenAndCheckStartList(f, token))
++        return;
++    ReadOpenedList(f, token, list);
++}
++
++/* f format is (1.0 2.0 0.3 0.4)*/
++void PrimeFileIO::ReadList(FILE *f, char *token, std::vector<double> &list)
++{
++    if (!ReadNextTokenAndCheckStartList(f, token))
++        return;
++    ReadOpenedList(f, token, list);
++}
++
++static void fillConnectForCell(size_t iCell, bool right_cell, cm2::UIntMat &connectM, const cm2::UIntMat &facePrimeData, size_t iFace,
++                               std::vector<int> &cellCount)
++{
++
++    if (cellCount[iCell] == 0)
++    {
++        if (right_cell)
++        {
++            for (size_t j = 0; j < 3; j++)
++            {
++                connectM(j, iCell) = facePrimeData(j, iFace);
++            }
++            cellCount[iCell] = 3;
++        }
++        else
++        {
++            for (size_t j = 1; j <= 3; j++)
++            {
++                connectM(j, iCell) = facePrimeData(j - 1, iFace);
++            }
++            cellCount[iCell] = -3;
++        }
++    }
++    else if (cellCount[iCell] == 3)
++    {
++        for (size_t j = 0; j < 3; j++)
++        {
++            bool found = false;
++            for (size_t k = 0; k < 3; k++)
++            {
++                if (facePrimeData(j, iFace) == connectM(k, iCell))
++                {
++                    found = true;
++                    break;
++                }
++            }
++            if (!found)
++            {
++                /*if (iCell == 0)
++                {
++                    printf("alreay cell ids %d %d %d and new node %d\n", connectM(0, iCell), connectM(1, iCell), connectM(2, iCell), facePrimeData(j,
++                iFace));
++                }*/
++                connectM(3, iCell) = facePrimeData(j, iFace);
++                cellCount[iCell] = 4;
++                /*if (iCell == 0)
++                {
++                    printf("alreay cell ids %d %d %d and new node %d\n", connectM(0, iCell), connectM(1, iCell), connectM(2, iCell), connectM(3,
++                iCell));
++                }*/
++                break;
++            }
++        }
++    }
++    else if (cellCount[iCell] == -3)
++    {
++        for (size_t j = 0; j < 3; j++)
++        {
++            bool found = false;
++            for (size_t k = 1; k <= 3; k++)
++            {
++                if (facePrimeData(j, iFace) == connectM(k, iCell))
++                {
++                    found = true;
++                    break;
++                }
++            }
++            if (!found)
++            {
++                /*if (iCell == 0)
++                {
++                    printf("alreay cell ids %d %d %d and new node %d\n", connectM(0, iCell), connectM(1, iCell), connectM(2, iCell), facePrimeData(j,
++                iFace));
++                }*/
++                connectM(0, iCell) = facePrimeData(j, iFace);
++                cellCount[iCell] = 4;
++                break;
++            }
++        }
++    }
++}
++
++static void flushBinInts(FILE *f, int n, int size_of_bin_int, int *tmp_data)
++{
++    for (int i = 0; i < n; i++)
++    {
++        int ret_ = fread(tmp_data, size_of_bin_int, 1, f);
++        std::ignore = ret_;
++    }
++}
++
++static void flushBinDoubles(FILE *f, int n, int size_of_bin_double, double *tmp_data)
++{
++    for (int i = 0; i < n; i++)
++    {
++        int ret_ = fread(tmp_data, size_of_bin_double, 1, f);
++        std::ignore = ret_;
++    }
++}
++
++void PrimeFileIO::ReadStatshBinData(FILE *f, char *token, int size_of_bin_int, int size_of_bin_double)
++{
++    NreadNextToken(f, token, 1);
++
++    /*fscanf(f, "%d %d %s %d %d %d %d %d %d %d",
++           &k, &lt->id,  lt->name, &lt->order,
++           &lt->klass, &lt->type, &lt->etype, &lt->ntv,
++           &curvature_data, &periodic_data);*/
++
++    NreadNextToken(f, token, 3); /*k, id, name*/
++    int order;
++    int ret_ = fscanf(f, "%d", &order);
++    NreadNextToken(f, token, 3); /* &lt->klass, &lt->type, &lt->etype*/
++    int ntv, curvature_data, periodic_data;
++    ret_ = fscanf(f, "%d %d %d", &ntv, &curvature_data, &periodic_data);
++
++    FlushReadList(f);
++    NreadNextToken(f, token, 1); /* to read "(""*/
++
++    int *tmp_int_data = (int *)malloc(size_of_bin_int);
++    double *tmp_double_data = (double *)malloc(size_of_bin_double);
++
++    flushBinInts(f, ntv, size_of_bin_int, tmp_int_data);
++
++    /*reading twice is correct*/
++    flushBinInts(f, ntv, size_of_bin_int, tmp_int_data);
++    int nn;
++    ret_ = fread(&nn, size_of_bin_int, 1, f);
++
++    flushBinDoubles(f, 3 * nn, size_of_bin_double, tmp_double_data);
++
++    if (curvature_data)
++    {
++        flushBinDoubles(f, nn, size_of_bin_double, tmp_double_data);
++    }
++
++    flushBinInts(f, nn, size_of_bin_int, tmp_int_data);
++
++    int nel;
++    ret_ = fread(&nel, size_of_bin_int, 1, f);
++    flushBinInts(f, nel, size_of_bin_int, tmp_int_data);
++
++    int ne;
++    ret_ = fread(&ne, size_of_bin_int, 1, f);
++    flushBinInts(f, ne, size_of_bin_int, tmp_int_data);
++
++    if (order == 2 && periodic_data) /* 2 == ENTITY_FACE */
++    {
++        flushBinInts(f, ne, size_of_bin_int, tmp_int_data);
++    }
++    FlushReadList(f);
++    free(tmp_int_data);
++    free(tmp_double_data);
++    std::ignore = ret_;
++}
++
++int PrimeFileIO::ReadPrimeData(FILE *f, cm2::tetramesh_iso::mesher::data_type &tetData, std::shared_ptr<OccDataStructure> m_occData,
++                               bool &foundDiscardedFaces)
++{
++    // reading the pmdat file f and populating the data to empty tetData->cm2 structure
++
++    char token[MAX_NAME_LENGTH];
++    std::string line;
++    cm2::UIntMat facePrimeData;
++    int ret_;
++    m_numberOfBoundaryFaces = 0;
++    int sizeof_prime_real = -1;
++    int sizeof_prime_elm_index = -1;
++
++    int sectionid;
++
++    ReadNextToken(f, token);
++    while (token[0] == '(')
++    {
++
++        NreadNextToken(f, token, 1);
++        sectionid = atoi(token);
++        bool binary = false;
++
++        if (sectionid > 1000)
++        {
++            binary = true;
++            // printf("we reading binary...\n");
++            sectionid = sectionid % 1000;
++        }
++        if (sectionid == 10)
++        {
++            NreadNextToken(f, token, 2);
++            int primeColorId = std::stoi(token, 0, 16);
++
++            if (primeColorId == 0)
++            {
++                NreadNextToken(f, token, 2);
++                m_numberOfNodes = std::stoi(token, 0, 16);
++                FlushReadList(f);
++
++                tetData.pos.reserve(3, m_numberOfNodes);
++                printf("the number of node : %d\n", m_numberOfNodes);
++            }
++            else
++            {
++                /*CODE FOR ACCESSING NODE THREAD DETAILS*/
++                cm2::DoubleVec coord(3);
++                threadInfo.id = primeColorId;
++
++                ret_ = fscanf(f, "%x%x%d%d", &threadInfo.start, &threadInfo.end, &threadInfo.type, &threadInfo.etype);
++                nodeInfoVector.push_back(threadInfo);
++
++                FlushReadList(f);
++                printf("node->id : %d node->start : %d node->end : %d \n", threadInfo.id, threadInfo.start, threadInfo.end);
++
++                if (ReadNextTokenAndCheckStartList(f, token))
++                {
++                    for (unsigned int i = threadInfo.start; i <= threadInfo.end; i++)
++                    {
++                        if (!binary)
++                        {
++                            ret_ = fscanf(f, "%lf%lf%lf", coord.data(), coord.data() + 1, coord.data() + 2); // look into google for assert
++                        }
++                        else
++                        {
++                            ret_ = fread(coord.data(), sizeof_prime_real, 3, f);
++                        }
++
++                        tetData.pos.push_back(coord);
++                    }
++
++                    FlushReadList(f);
++                }
++            }
++        }
++        else if (sectionid == 11)
++        {
++            NreadNextToken(f, token, 2);
++
++            if (std::stoi(token, 0, 16) == 0)
++            {
++
++                NreadNextToken(f, token, 2);
++                m_numberOfEdges = std::stoi(token, 0, 16);
++                FlushReadList(f);
++                printf("the number of edges : %d\n", m_numberOfEdges);
++            }
++        }
++        else if (sectionid == 12)
++        {
++            NreadNextToken(f, token, 2);
++
++            if (std::stoi(token, 0, 16) == 0)
++            {
++                NreadNextToken(f, token, 2);
++                m_numberOfCells = std::stoi(token, 0, 16);
++
++                FlushReadList(f);
++                printf("the number of cells : %d\n", m_numberOfCells);
++            }
++            else
++            {
++                /*CODE FOR ACCESSING CELL THREAD DETAILS*/
++
++                threadInfo.id = std::stoi(token, 0, 16);
++
++                ret_ = fscanf(f, "%x%x%d%d", &threadInfo.start, &threadInfo.end, &threadInfo.type, &threadInfo.etype);
++                cellInfoVector.push_back(threadInfo);
++                printf("the cell id is %d\n", threadInfo.id);
++
++                for (unsigned int i = threadInfo.start; i <= threadInfo.end; i++)
++                {
++                    tetData.colors.push_back(threadInfo.id);
++                }
++                FlushReadList(f);
++            }
++        }
++        else if (sectionid == 13)
++        {
++            NreadNextToken(f, token, 2);
++
++            if (std::stoi(token, 0, 16) == 0)
++            {
++
++                NreadNextToken(f, token, 2);
++                m_numberOfFaces = std::stoi(token, 0, 16);
++
++                FlushReadList(f);
++                facePrimeData.reserve(5, m_numberOfFaces);
++                printf("the number of faces : %d\n", m_numberOfFaces);
++            }
++            else
++            {
++                /*CODE FOR ACCESSING FACE THREAD DETAILS*/
++
++                cm2::UIntVec faceData(5);
++                threadInfo.id = std::stoi(token, 0, 16);
++
++                ret_ = fscanf(f, "%x%x%d%d", &threadInfo.start, &threadInfo.end, &threadInfo.type, &threadInfo.etype);
++                faceInfoVector.push_back(threadInfo);
++                FlushReadList(f);
++
++                ReadNextToken(f, token);
++                for (unsigned int i = threadInfo.start; i <= threadInfo.end; i++)
++                {
++                    if (!binary)
++                    {
++                        ret_ = fscanf(f, "%x%x%x%x%x", faceData.data(), faceData.data() + 1, faceData.data() + 2, faceData.data() + 3,
++                                      faceData.data() + 4);
++                    }
++                    else
++                    {
++                        for (unsigned int k = 0; k < 5; k++)
++                        {
++                            ret_ = fread(faceData.data() + k, sizeof_prime_elm_index, 1, f); // 12th element of arrray
++                        }
++                    }
++
++                    for (unsigned int k = 0; k < 5; k++)
++                    {
++                        if (faceData[k] == 0)
++                        {
++                            faceData[k] = m_numberOfCells + 10;
++                        }
++                        else
++                        {
++                            faceData[k] = faceData[k] - 1;
++                        }
++                    }
++                    for (unsigned int k = 0; k < 5; k++)
++                    {
++                        if (faceData[k] > m_numberOfCells + 10 && faceData[k] > m_numberOfNodes)
++                        {
++                            printf("We have a problem with data read at %d\n", i);
++                        }
++                    }
++                    facePrimeData.push_back(faceData);
++                    if (threadInfo.type > 2)
++                    {
++                        m_numberOfBoundaryFaces++;
++                    }
++                }
++
++                FlushReadList(f);
++            }
++        }
++        else if (sectionid == 4)
++        {
++            NreadNextToken(f, token, 11);
++            sizeof_prime_real = atoi(token);
++            NreadNextToken(f, token, 2);
++            sizeof_prime_elm_index = atoi(token);
++
++            printf(" the size of prime_real is : %d,  and the size of prime_elm_index : %d", sizeof_prime_real, sizeof_prime_elm_index);
++            FlushReadList(f);
++        }
++        else if (sectionid == 71)
++        {
++            if (binary)
++            {
++                ReadStatshBinData(f, token, sizeof_prime_elm_index, sizeof_prime_real);
++            }
++            /*if not binary, FlushReadList at end will take care of the stash data read */
++        }
++        /*else if(sectionid == 60)
++        {
++            float min_h, max_h, default1, default2;
++            NreadNextToken(f, token, 3);
++            if(token == "size-func/global-params")
++            {
++                NreadNextToken(f,token,1);
++                fscanf(f,"%f%f%f%f", &min_h , &max_h, &default1, &default2);
++                printf(" min_h : %f max_h : %f ", min_h, max_h);
++            }
++            else
++            {
++                FlushReadList(f);
++            }
++        }*/
++
++        FlushReadList(f);
++        ReadNextToken(f, token);
++    }
++
++    /*Creating connectM & connectB */
++    cm2::UIntMat connectM(4, m_numberOfCells);
++    cm2::UIntMat connectB(3, m_numberOfBoundaryFaces);
++
++    /*Creating a cellCount Vector and intiating all to zero */
++    std::vector<int> cellCount(m_numberOfCells, 0);
++
++    /*Debug prints*/
++    cout << " number of faces : " << m_numberOfFaces << " number of cells : " << m_numberOfCells << " number of nodes : " << m_numberOfNodes
++         << " number of boundary faces : " << m_numberOfBoundaryFaces << endl;
++    /*
++    std::string debug_file = occData->getDebugOutputPath() + "/afterConnectBFilled" + ".dat";
++    tetData.save(debug_file.c_str());
++    FILE* faceDataF = fopen( (occData->getDebugOutputPath() + "/" + "face_data.txt").c_str() , "w");
++    for (unsigned int i = 0; i < m_numberOfFaces; i++)
++    {
++        fprintf(faceDataF, "face data %d %d %d %d %d\n", (int)facePrimeData(0,i), (int)facePrimeData(1,i), (int)facePrimeData(2,i),
++    (int)facePrimeData(3,i), (int)facePrimeData(4,i));
++    }
++    fprintf(faceDataF, "done\n");
++    */
++
++    foundDiscardedFaces = false;
++
++    /*CURRENT CODE FOR CONNECT M >*/
++    for (unsigned int i = 0; i < m_numberOfFaces; i++)
++    {
++        unsigned int iRCell = facePrimeData(RCELL, i);
++        unsigned int iLCell = facePrimeData(LCELL, i);
++        if (iRCell > m_numberOfCells && iLCell > m_numberOfCells)
++        {
++            foundDiscardedFaces = true;
++            continue;
++        }
++        if (iRCell < m_numberOfCells)
++        {
++            fillConnectForCell(iRCell, true, connectM, facePrimeData, i, cellCount);
++        }
++        if (iLCell < m_numberOfCells)
++        {
++            fillConnectForCell(iLCell, false, connectM, facePrimeData, i, cellCount);
++        }
++    }
++
++    tetData.connectM.copy(connectM);
++
++    /*Debug file to check the status of connect B and compare it with cm2 mesher*/
++    if (m_occData->isAddDebugInfoFlag() >= 5)
++    {
++        std::string debug_file_M = m_occData->getDebugOutputPath() + "/afterConnectMFilled.debugFile" + ".dat";
++        tetData.save(debug_file_M.c_str());
++    }
++
++    std::ignore = ret_;
++    return 1;
++}
++
++void PrimeFileIO::WritePrimeData(FILE *fw, const cm2::intersect_t3::mesher::data_type &dataAllRemeshed)
++{
++    /*WRITE CELLS AND EDGES*/
++    int iN = (int)dataAllRemeshed.pos.cols();
++    int iT = (int)dataAllRemeshed.connectM.cols();
++
++    /*COLOR INFORMATION PROCESSING */
++    int iC = (int)dataAllRemeshed.colors.size();
++    // printf( "the iC value is : %d & the iT value is : %d", iC, iT);    //iC and iT remains the same and we can proceed
++
++    /*map creation for reverse mapping triangle id's for specific colors*/
++    std::map<int, std::vector<int>> color2section;
++
++    /*the loop will populate the map*/
++    for (int i = 0; i < iC; i++)
++    {
++        color2section[dataAllRemeshed.colors(i)].push_back(i);
++    }
++
++    /*proposed id for node thread*/
++    int node_id = color2section.size() + 1;
++
++    /*check for proposed id to be unique*/
++    while (color2section.find(node_id) != color2section.end())
++    {
++        node_id++;
++    }
++
++    /*writing them into the pmdat file*/
++    unsigned int count = 1, vSize;
++
++    /*PMDAT FILE*/
++    fprintf(fw, "(10 (0 1 %x 0))\n(13 (0 1 %x 0))\n(12 (0 0 0 0))\n", iN, iT);
++    fprintf(fw, "(10 (%d 1 %x 2 3)\n(\n", node_id, iN);
++    for (int i = 0; i < iN; i++)
++    {
++
++        fprintf(fw, "%f %f %f\n", dataAllRemeshed.pos(0, i), dataAllRemeshed.pos(1, i), dataAllRemeshed.pos(2, i));
++    }
++    fprintf(fw, "))\n");
++
++    /*Writing individual sections for colors*/
++    for (auto c2s = color2section.begin(); c2s != color2section.end(); c2s++)
++    {
++
++        vSize = c2s->second.size();
++        fprintf(fw, "(13 (%d %x %x 3 3)\n(\n", c2s->first + 1, count, count - 1 + vSize);
++        for (unsigned int i = 0; i < vSize; i++)
++        {
++            fprintf(fw, "%x %x %x 0 0\n", dataAllRemeshed.connectM(0, c2s->second[i]) + 1, dataAllRemeshed.connectM(1, c2s->second[i]) + 1,
++                    dataAllRemeshed.connectM(2, c2s->second[i]) + 1);
++        }
++        fprintf(fw, "))\n");
++        count += vSize;
++    }
++
++    /*Defining the min_size , max_size and growth_rate */
++    double min_size = m_meshConstruction->getMinEdgeLength();
++    double max_size = m_meshConstruction->cm2TetmeshSettings().target_metric;
++    double growth_rate = 1 + m_meshConstruction->cm2TetmeshSettings().max_gradation;
++
++    /*Appending them to the pmdat */
++    fprintf(fw, "\n(60 (\n(size-func/global-params (%lf %lf %lf 2.0))\n ))\n", min_size, max_size, growth_rate);
++
++    /*closing the file */
++    fclose(fw);
++}
++
++void PrimeFileIO::GenerateVolumePyFile()
++{
++    std::stringstream ss;
++    ss << primeFolderPath() << "/generateVolume_" << m_meshConstruction->uniqueBaseIdentifier() << ".py";
++    std::ofstream out(ss.str());
++    // prime config finalize api: prime.finalize()
++    // push it once it is working for me..
++    // It should be called in the end..of py script
++
++    /*Import all the PRIME meshing functionality*/
++    out << "import ansys.meshing.prime as prime" << std::endl;
++    out << "import PrimePyAnsysPrimeServer" << std::endl;
++    out << "import os\n"
++        << "model = prime.local_model()\n"
++        << "fileIO = prime.FileIO(model)" << std::endl;
++
++    /*Read the boundary file and use the prime.AutoMesh()... to mesh it*/
++    out << "fileIO.import_fluent_case(os.path.join(\"" << dockerWorkDir().c_str() << "\",\"" << m_boundaryMeshFileName.c_str()
++        << "\"), prime.ImportFluentCaseParams(model = model))" << std::endl;
++    out << "results = prime.AutoMesh(model=model).mesh(part_id=model.parts[0].id, automesh_params=prime.AutoMeshParams(model=model))" << std::endl;
++
++    /*Write them into the pmdat file using prime.write_pmdat()... */
++    out << "fileIO.write_pmdat(os.path.join(\"" << dockerWorkDir().c_str() << "\",\""
++        << "volumeMesh_" << m_meshConstruction->uniqueBaseIdentifier() << "_fromPrime.pmdat"
++        << "\"), prime.FileWriteParams(model))" << std::endl;
++
++    /*calling Prime.Finalize()*/
++    out << "PrimePyAnsysPrimeServer.Finalize()" << std::endl;
++}
++
++void PrimeFileIO::CreatePrimeShellScript()
++{
++
++    /* OLD CODE
++    std::stringstream ss;
++    ss << m_meshConstruction->occData()->getDebugOutputPath() << "/runPrimeImage_" << unique_name << ".sh";
++    */
++
++    // NEW CODE
++    std::stringstream ss;
++    ss << primeFolderPath() << "/runPrimeImage_" << m_meshConstruction->uniqueBaseIdentifier() << ".sh";
++    std::ofstream out(ss.str());
++    std::string unique_name =
++        m_meshConstruction->occData()->getOriginalFileBaseName() + "_" + std::to_string(m_meshConstruction->uniqueBaseIdentifier());
++
++    out << "#!/bin/bash\n" << std::endl;
++    out << "# Run the Docker command inside the container" << std::endl;
++
++    out << "docker run --rm --name running_prime_container_" << unique_name << " -v " << m_meshConstruction->occData()->getAbsoluteDebugOutputPath()
++        << "/prime"
++        << ":"
++        << "/local/workdir";
++
++    // if PRIME DOCKER is running outside the DOCKER ENV...
++    if (isDOOD())
++        out << " --volumes-from Linux ";
++
++    // out << " -e ANSYSLMD_LICENSE_FILE=1055@milflexlm1.ansys.com"
++    out << " -e ANSYS_ELASTIC_CLS=M3HAH4PTNKVK:623041"
++        << " --entrypoint /prime/meshing/Prime/runPrime.sh local_prime " << dockerWorkDir() << "/generateVolume_"
++        << m_meshConstruction->uniqueBaseIdentifier() << ".py";
++
++    out << " > " << m_meshConstruction->occData()->getAbsoluteDebugOutputPath() << "/prime/primeLog.txt 2>&1";
++    out << std::endl;
++}
++
++PrimeFileIO::~PrimeFileIO() {}
+\ No newline at end of file

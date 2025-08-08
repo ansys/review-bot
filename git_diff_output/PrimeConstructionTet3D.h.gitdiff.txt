@@ -1,0 +1,21 @@
+diff --git a/mesh/PrimeConstructionTet3D.h b/mesh/PrimeConstructionTet3D.h
+index 11eadc6..ee02c44 100644
+--- a/mesh/PrimeConstructionTet3D.h
++++ b/mesh/PrimeConstructionTet3D.h
+@@ -22,7 +22,15 @@ class PrimeConstructionTet3D : public Cm2ConstructionTet3D
+   protected:
+     virtual bool createTetMesh(cm2::intersect_t3::mesher::data_type &dataAllRemeshed) override;
+ 
++    virtual double getAverageCellQuality() override { return m_dAverageCellQuality; }
++    virtual double getWorstCellQuality() override { return m_dWorstCellQuality; }
++
++    void updateShapeQualities();
++    void updateAncestorsAndNeighbours();
++
+   private:
++    double m_dAverageCellQuality;
++    double m_dWorstCellQuality;
+ };
+ 
+ #endif
+\ No newline at end of file

@@ -1,0 +1,102 @@
+diff --git a/mesh/PrimeFileIO.h b/mesh/PrimeFileIO.h
+new file mode 100644
+index 0000000..190aebf
+--- /dev/null
++++ b/mesh/PrimeFileIO.h
+@@ -0,0 +1,95 @@
++#ifndef PRIME_FILEIO_H
++#define PRIME_FILEIO_H
++
++#include "Cm2Construction3D.h"
++#include "Cm2ConstructionTet3D.h"
++
++//////////////////////////////////////////////////////////////////////////////////////////////////////////////
++//  PrimeFileIO
++//  Utility Functions for PrimeConstructionTet3D
++//////////////////////////////////////////////////////////////////////////////////////////////////////////////
++
++class PrimeFileIO
++{
++  private:
++    unsigned int m_numberOfNodes, m_numberOfEdges, m_numberOfCells, m_numberOfFaces, m_numberOfBoundaryFaces;
++
++    struct threadInfo
++    {
++        int id;
++        unsigned int start, end;
++        int type, etype;
++    } threadInfo;
++
++    std::vector<struct threadInfo> nodeInfoVector, faceInfoVector, cellInfoVector;
++
++  public:
++    PrimeFileIO(Cm2Construction3D *meshConstruction);
++    virtual ~PrimeFileIO();
++
++    void writeBoundaryMesh(const cm2::intersect_t3::mesher::data_type &dataAllRemeshed);
++    int ReadVolumeMesh(cm2::tetramesh_iso::mesher::data_type &tetData, std::shared_ptr<OccDataStructure> m_occData, bool &foundDiscardedFaces);
++
++    // void GenerateVolumePyFile(FILE* fPy, std::string& volumeMeshFileName);
++    void GenerateVolumePyFile();
++    void CreatePrimeShellScript();
++    void RunPrimeShellScript(std::shared_ptr<OccDataStructure> m_occData);
++    bool CreateDirectory(const std::string &dirName);
++
++    // public for the time being, should be moved in a similar manner into the protected region
++    // as done with the writeBoundaryMesh
++    // int  ReadPrimeData(FILE* f, cm2::tetramesh_iso::mesher::data_type& tetData, std::shared_ptr<OccDataStructure> m_occData, bool&
++    // foundDiscardedFaces);
++    int ReadPrimeData(FILE *f, cm2::tetramesh_iso::mesher::data_type &tetData, std::shared_ptr<OccDataStructure> m_occData,
++                      bool &foundDiscardedFaces);
++
++  protected:
++    std::string primeFolderPath();
++
++    void FlushString(FILE *f);
++    char *ReadStringLarge(FILE *f, char *token, int *max_len);
++    void ReadString(FILE *f, char *token);
++    void ReadToken(FILE *f, char *token);
++
++    bool CheckNextChar(FILE *f, char c);
++    bool IsNextTokenString(FILE *f);
++    bool IsNextTokenListEnd(FILE *f);
++
++    char *ReadNextToken(FILE *f, char *token, int *max_len);
++    void ReadNextToken(FILE *f, char *token);
++    void NreadNextToken(FILE *f, char *token, int n);
++
++    char *ReadNextTokenLarge(FILE *f, char *token, int *max_len);
++    void ReadStartList(FILE *f, char *token);
++    void FlushReadList(FILE *f);
++
++    void Cdr(FILE *f, char *token);
++    bool ReadNextTokenAndCheckStartList(FILE *f, char *token);
++    void ReadOpenedList(FILE *f, char *token, std::vector<int> &list);
++    void ReadOpenedList(FILE *f, char *token, std::vector<std::string> &list);
++    void ReadOpenedList(FILE *f, char *token, std::vector<double> &list);
++    double ReadDouble(FILE *f);
++    int ReadInt(FILE *f);
++
++    void ReadList(FILE *f, char *token, std::vector<int> &list);
++    void ReadList(FILE *f, char *token, std::vector<std::string> &list);
++    void ReadList(FILE *f, char *token, std::vector<double> &list);
++
++    void ReadStatshBinData(FILE *f, char *token, int size_of_bin_int, int size_of_bin_double);
++
++    void WritePrimeData(FILE *fw, const cm2::intersect_t3::mesher::data_type &dataAllRemeshed);
++    // void fileOpen(FILE* fopen, )
++
++    /*Create a getter and setter for nodeInfoVector and nodeDataVector vectors..*/
++
++  private:
++    Cm2Construction3D *m_meshConstruction;
++
++    std::string m_boundaryMeshFileName = "";
++    std::string m_volumeMeshFileName = "";
++
++    bool isDOOD();
++    std::string dockerWorkDir();
++};
++
++#endif
+\ No newline at end of file
